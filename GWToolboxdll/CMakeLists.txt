@@ -270,6 +270,11 @@ target_include_directories(GWToolbox_DLL PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_precompile_headers(GWToolbox_DLL PRIVATE "stdafx.h")
 source_group(Generated REGULAR_EXPRESSION cmake_pch)
 
+# Pure reducer compiles without DLL PCH so QuestProgressTests can reuse the same TU.
+set_source_files_properties(
+    "${CMAKE_CURRENT_SOURCE_DIR}/Modules/QuestProgressReducer.cpp"
+    PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
 target_compile_definitions(GWToolbox_DLL PRIVATE
     "_USRDLL"
     )
