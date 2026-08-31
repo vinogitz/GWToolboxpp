@@ -6,7 +6,10 @@ set(GWTOOLBOXEXE_VERSION "4.8")
 set(GWTOOLBOXEXE_MODULE_VERSION "4,8,0,0") # used for exe module info. See GWToolbox/GWToolbox.rc
 set(GWTOOLBOXDLL_VERSION "8.35")
 set(GWTOOLBOXDLL_VERSION_BETA "") # can be anything. Marks beta version if not empty.
+set(GWTOOLBOXDLL_VERSION_FORK_SUFFIX "+quest") # appended to updater version string on fork builds
 set(GWTOOLBOX_MODULE_VERSION "8,35,0,0")
+
+option(GWTOOLBOX_FORK_BUILD "Custom fork build (Quest Tracker, etc.) — updater merges upstream instead of replacing DLL" ON)
 
 
 # Everything below this point (toolchain checks, compiler flags, native-only dependency
@@ -90,6 +93,13 @@ add_compile_definitions(
     "GWTOOLBOXDLL_VERSION_BETA=\"${GWTOOLBOXDLL_VERSION_BETA}\""
     "GWTOOLBOX_MODULE_VERSION=${GWTOOLBOX_MODULE_VERSION}"
     )
+
+if(GWTOOLBOX_FORK_BUILD)
+    add_compile_definitions(
+        "GWTOOLBOX_FORK_BUILD=1"
+        "GWTOOLBOXDLL_VERSION_FORK_SUFFIX=\"${GWTOOLBOXDLL_VERSION_FORK_SUFFIX}\""
+    )
+endif()
 	
 # Stored in a variable so targets that turn on -Wall/-Wextra can re-apply them after it.
 set(CLANG_WARNING_DISABLES
