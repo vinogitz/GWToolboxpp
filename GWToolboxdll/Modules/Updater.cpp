@@ -48,6 +48,7 @@ namespace {
     bool is_latest_version = true;
     bool notified = false;
     bool forced_ask = false;
+    bool fork_confirm_official_update = false;
     clock_t last_check = 0;
 
     // Set once on launch when the running version differs from the version we
@@ -56,6 +57,41 @@ namespace {
 
     GWToolboxRelease latest_release;
     GWToolboxRelease current_release;
+
+    std::string UpstreamBaseVersion()
+    {
+        std::string version = GWTOOLBOXDLL_VERSION;
+        std::ranges::transform(version, version.begin(), [](const auto chr) {
+            return static_cast<char>(std::tolower(chr));
+        });
+        return version;
+    }
+
+    void AppendForkVersionSuffix(std::string& version)
+    {
+#ifdef GWTOOLBOX_FORK_BUILD
+        version.append(GWTOOLBOXDLL_VERSION_FORK_SUFFIX);
+#endif
+    }
+
+    bool ForkBuildEnabled()
+    {
+#ifdef GWTOOLBOX_FORK_BUILD
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    const char* ForkMergeCommand()
+    {
+        return "git fetch upstream && git merge upstream/master";
+    }
+
+    const char* ForkRebuildCommand()
+    {
+        return "scripts\\sync-upstream-build.ps1";
+    }
 
     GWToolboxRelease* GetLatestRelease(GWToolboxRelease* release)
     {
@@ -186,6 +222,74 @@ namespace {
             });
     }
 
+    void DrawForkUpdateDialog()
+    {
+        auto& updater = Updater::Instance();
+        if (!updater.visible) {
+            updater.visible = true;
+        }
+        ImGui::SetNextWindowSize(ImVec2(520.0f * ImGui::FontScale(), -1), ImGuiCond_Appearing);
+        ImGui::SetNextWindowCenter(ImGuiCond_Appearing);
+        ImGui::Begin("Toolbox Update!", &updater.visible);
+        ImGui::TextUnformatted("Upstream GWToolbox++ update is available.");
+        ImGui::TextUnformatted(UpdateAvailableText());
+        ImGui::Spacing();
+        ImGui::PushTextWrapPos();
+        ImGui::TextUnformatted(
+            "This is a custom build with Quest Tracker and other fork features.\n"
+            "Installing the official GitHub DLL removes those features.");
+        ImGui::Spacing();
+        ImGui::TextUnformatted("To pull upstream fixes and keep fork features:");
+        ImGui::BulletText("%s", ForkRebuildCommand());
+        ImGui::BulletText("%s", ForkMergeCommand());
+        ImGui::PopTextWrapPos();
+        ImGui::Spacing();
+        ImGui::TextUnformatted("Upstream changes:");
+        ImGui::TextUnformatted(latest_release.body.c_str());
+        ImGui::Spacing();
+        if (ImGui::Button("Later###gwtoolbox_fork_later", ImVec2(100, 0))) {
+            settings.dismissed_upstream_size = latest_release.size;
+            step = Done;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Copy merge command", ImVec2(140, 0))) {
+            ImGui::SetClipboardText(ForkMergeCommand());
+            Log::Flash("Merge command copied to clipboard");
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Merged upstream", ImVec2(140, 0))) {
+            settings.dismissed_upstream_size = latest_release.size;
+            is_latest_version = true;
+            step = Done;
+            Log::Flash("Marked upstream %s as merged — rebuild when ready", latest_release.version.c_str());
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Official DLL...", ImVec2(110, 0))) {
+            fork_confirm_official_update = true;
+        }
+        if (fork_confirm_official_update) {
+            ImGui::OpenPopup("Install official DLL?");
+        }
+        if (ImGui::BeginPopupModal("Install official DLL?", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextUnformatted("This replaces your custom build with the official release.\nQuest Tracker and other fork features will be removed.");
+            if (ImGui::Button("Cancel###fork_official_cancel", ImVec2(100, 0))) {
+                fork_confirm_official_update = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Install###fork_official_ok", ImVec2(100, 0))) {
+                fork_confirm_official_update = false;
+                ImGui::CloseCurrentPopup();
+                DoUpdate();
+            }
+            ImGui::EndPopup();
+        }
+        ImGui::End();
+        if (!updater.visible) {
+            step = Done;
+        }
+    }
+
     // Shown once, the first time a freshly-updated build runs. A heartfelt, human
     // ask — Toolbox gets flagged as a false positive because it injects into Gw.exe,
     // and a lively, well-starred GitHub project reads as more trustworthy to AV
@@ -258,10 +362,16 @@ const GWToolboxRelease* Updater::GetCurrentVersionInfo(GWToolboxRelease* out)
     out->size = static_cast<uintmax_t>(std::ceil(size_bytes / 16.0) * 16);
     out->version = GWTOOLBOXDLL_VERSION;
     out->version.append(GWTOOLBOXDLL_VERSION_BETA);
+    AppendForkVersionSuffix(out->version);
     std::ranges::transform(out->version, out->version.begin(), [](const auto chr) {
         return static_cast<char>(std::tolower(chr));
     });
     return out;
+}
+
+bool Updater::IsForkBuild()
+{
+    return ForkBuildEnabled();
 }
 
 void Updater::Initialize()
@@ -288,6 +398,14 @@ void Updater::LoadSettings(SettingsDoc& doc, ToolboxIni* legacy)
     if (doc.Get(Name(), "dllversion", previous_version) && !previous_version.empty() && previous_version != GWTOOLBOXDLL_VERSION) {
         show_star_request = true;
     }
+    if (ForkBuildEnabled()) {
+        uintmax_t saved_dll_size = 0;
+        GWToolboxRelease running{};
+        if (GetCurrentVersionInfo(&running) && doc.Get(Name(), "dllfilesize", saved_dll_size)
+            && saved_dll_size != running.size) {
+            settings.dismissed_upstream_size = 0;
+        }
+    }
 #endif
     CheckForUpdate();
 }
@@ -303,6 +421,12 @@ void Updater::SaveSettings(SettingsDoc& doc)
     CHAR dllfile[MAX_PATH];
     const DWORD size = GetModuleFileName(module, dllfile, MAX_PATH);
     doc.Set(Name(), "dllpath", std::string(size > 0 ? dllfile : "error"));
+    if (ForkBuildEnabled()) {
+        GWToolboxRelease running{};
+        if (GetCurrentVersionInfo(&running)) {
+            doc.Set(Name(), "dllfilesize", running.size);
+        }
+    }
 #endif
 }
 
@@ -350,7 +474,29 @@ void Updater::CheckForUpdate(const bool forced)
             }
             return;
         }
-        is_latest_version = false;
+
+        if (ForkBuildEnabled()) {
+            const auto upstream_base = UpstreamBaseVersion();
+            if (latest_release.version == upstream_base
+                && latest_release.size == settings.dismissed_upstream_size) {
+                step = Done;
+                is_latest_version = true;
+                if (forced) {
+                    Log::Flash("Fork build matches dismissed upstream release");
+                }
+                return;
+            }
+            if (latest_release.version != upstream_base) {
+                is_latest_version = false;
+            }
+            else {
+                // Same upstream tag — hotfix/rebuild at new DLL size.
+                is_latest_version = false;
+            }
+        }
+        else {
+            is_latest_version = false;
+        }
         if (!forced && settings.update_mode == Mode::DontCheckForUpdates) {
             step = Done;
             return; // Do not check for updates
@@ -359,6 +505,9 @@ void Updater::CheckForUpdate(const bool forced)
         // we have a new version!
         Mode iMode = forced ? Mode::CheckAndAsk : settings.update_mode;
         if constexpr (!std::string_view(GWTOOLBOXDLL_VERSION_BETA).empty()) {
+            iMode = Mode::CheckAndAsk;
+        }
+        if (ForkBuildEnabled() && iMode == Mode::CheckAndAutoUpdate) {
             iMode = Mode::CheckAndAsk;
         }
         switch (iMode) {
@@ -389,6 +538,10 @@ void Updater::Draw(IDirect3DDevice9*)
             step = Done;
             break;
         case CheckAndAsk: {
+            if (ForkBuildEnabled()) {
+                DrawForkUpdateDialog();
+                break;
+            }
             // check and ask
             if (!visible) {
                 visible = true;
@@ -414,7 +567,12 @@ void Updater::Draw(IDirect3DDevice9*)
         }
         break;
         case CheckAndAutoUpdate:
-            DoUpdate();
+            if (ForkBuildEnabled()) {
+                step = CheckAndAsk;
+            }
+            else {
+                DoUpdate();
+            }
             break;
         case Downloading: {
             if (!visible) {
