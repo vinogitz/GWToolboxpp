@@ -21,7 +21,8 @@ public:
     }
 
     [[nodiscard]] const char* Name() const override { return "Updater"; }
-    // DrawSettingInternal() called via ToolboxSettings; don't draw it again
+    // DrawSettingInternal() called via ToolboxSettings; don't draw it again, and point settings search there
+    [[nodiscard]] const char* SettingsName() const override { return "Toolbox Settings"; }
     bool HasSettings() override { return false; }
 
     enum class ReleaseType : int {
@@ -41,6 +42,7 @@ public:
         ReleaseType update_release_type = ReleaseType::Stable;
         // Fork: upstream hotfix at the same tag (size-only delta); cleared on rebuild.
         uintmax_t dismissed_upstream_size = 0;
+        bool has_starred = false;
     };
 
     void RegisterSettingsContent() override
