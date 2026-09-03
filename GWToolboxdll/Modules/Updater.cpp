@@ -85,12 +85,12 @@ namespace {
 
     const char* ForkMergeCommand()
     {
-        return "git fetch upstream && git merge upstream/master";
+        return "git fetch upstream && git rebase upstream/master";
     }
 
     const char* ForkRebuildCommand()
     {
-        return "scripts\\sync-upstream-build.ps1";
+        return "scripts\\sync-upstream-rebase.ps1";
     }
 
     GWToolboxRelease* GetLatestRelease(GWToolboxRelease* release)
