@@ -2,7 +2,8 @@
 
 Date: 2026-09-11  
 Status: **design only** (no production C++ in this change)  
-Base tip: `7b8d93d72dfc3eca87e46c8fccde77c3d698d089` (`feature/quest-tracker-phase-2-persistence`)
+Base tip: `7b8d93d72dfc3eca87e46c8fccde77c3d698d089` (`feature/quest-tracker-phase-2-persistence`)  
+Review amendments: C1–C3, W4–W6 (2026-09-11)
 
 ## Problem
 
@@ -10,15 +11,23 @@ On a long-lived character’s **first** Toolbox observation, several journey bui
 
 ## Preferred direction
 
-1. First **complete** live snapshot **seals** a persisted baseline for unlock/threshold state.
+1. First **complete** live snapshot **seals** a persisted baseline **per flood family** for unlock/threshold state.
 2. Baseline alone does **not** become timed `journeyEvents[]` milestones.
 3. Only later **newly observed deltas** append journey events.
-4. Current lifetime/unlock state remains exportable via Contract **snapshot** fields where they already exist (`level`, `skillPointsEarned`, `factionTotals`, `hallOfMonuments`, `missions`, titles projection).
+4. Current lifetime state remains exportable via Contract **snapshot** fields where they already exist (`level`, `skillPointsEarned`, `factionTotals`, `hallOfMonuments`, `missions`, titles projection).
 5. Missing world/account context must not seal an empty baseline or clear existing data.
-6. Uncertain/incomplete samples must not create confirmed-looking catch-up floods.
+6. Uncertain/incomplete samples must not create confirmed-looking catch-up floods (**must not seal**).
 7. No quest/combat/movement automation.
 
 This matches title/level’s existing first-sample suppress pattern and extends it to unlock/threshold kinds that currently catch up via `BuildNewlySeenIdEvents` / absolute thresholds / HoM-from-zero.
+
+### C1 — Unlock visibility tradeoff (accepted)
+
+**Decision (a):** Accept the visibility tradeoff for this phase.
+
+After seal, Contract v1 still has **no** unlock inventory snapshot arrays for map / character skill / hero / profession / vanquish. Those families are therefore visible in Life journey **only as deltas observed since tracking began** (plus any pre-policy catch-up noise already on disk). Permanent mission bits remain in `missions[]`; lifetime totals remain in existing snapshot fields.
+
+**Not in this phase:** Contract unlock-inventory enrichment (exporting sealed unlock sets as snapshot arrays). That requires a **separate future Contract sync** with Wayfarer before producer work. Until then, “what was already unlocked before Toolbox” is intentionally not reconstructible from Contract journey milestones alone.
 
 ---
 
@@ -55,18 +64,18 @@ Priors for unlocks/thresholds are reconstructed from **already emitted** `journe
 |------|--------|-------|----------------------|---------|-------------------|
 | `title_tier` | Snapshot `world->titles` | Character | No event until tier rises vs persisted `titles` | Keep suppress-until-delta | `titles` map (exists) |
 | `level_up` | Snapshot level | Character | No event until level rises vs `last_known_level` | Keep | `last_known_level` (exists) |
-| `map_enter` | Snapshot `GetMapID` | Character | Emits when prior map missing or changed | Keep visit emit (one event, not flood); optional: still require prior map optional seal without changing unlock policy | `last_map_id` (exists) |
-| `map_unlock` | Snapshot `unlocked_map` bits | Character | Emit-all vs empty prior from events | Seal baseline; emit only new bits | Persisted map-unlock id set / bitset |
-| `skill_unlock` | Snapshot `unlocked_character_skills` | Character | Emit-all catch-up | Seal; emit only new | Persisted skill-unlock id set |
-| `account_skill_unlock` | Snapshot account skill list | Account semantic, stored under active character | Emit-all under that character | Seal at **account** baseline; emit delta under observing character only | Account-level skill id set |
-| `hero_unlock` | Snapshot `hero_info` | Character | Emit-all catch-up | Seal; emit only new | Persisted hero id set |
-| `profession_unlock` | Snapshot profession bits | Character | Emit-all catch-up | Seal; emit only new | Persisted profession id set |
-| `hard_mode_unlock` | Snapshot flag | Character | Emit if unlocked and kind absent | Seal boolean; emit only false→true after seal | Persisted HM unlocked bool |
-| `vanquish_area` | Snapshot vanquish bits | Character | Emit-all catch-up | Seal; emit only new bits | Persisted vanquish map id set |
-| `cartography_threshold` | Snapshot fog % | Character | Catch-up all thresholds from 0 | Seal max %; emit only newly crossed thresholds after seal | Persisted max cartography % |
-| `skill_point_threshold` | Snapshot earned SP | Character | Catch-up from 0 via events | Seal max amount; emit only new crossings | Prefer seal from `skill_points_earned` snapshot + baseline amount |
-| `faction_threshold` | Snapshot earned factions | Character | Catch-up from 0 | Seal per-faction amounts; emit only new crossings | Prefer seal from `faction_totals` + baseline amounts |
-| `hom_points` | Async HoM snapshot | Character envelope | First sample treats previous as 0 → emit all non-zero | Seal HoM points (and dedications already stored); emit only increases after seal | `hall_of_monuments` + explicit “HoM baseline sealed” flag if first fetch must not emit |
+| `map_enter` | Snapshot `GetMapID` | Character | Emits when prior map missing or changed | Keep visit emit (one event, not flood) | `last_map_id` (exists) |
+| `map_unlock` | Snapshot `unlocked_map` bits | Character | Emit-all vs empty prior from events | Per-family seal; emit only new bits | Map-unlock id set + family sealed flag |
+| `skill_unlock` | Snapshot `unlocked_character_skills` | Character | Emit-all catch-up | Per-family seal; emit only new | Skill-unlock id set + family sealed flag |
+| `account_skill_unlock` | Snapshot account skill list | Account semantic, stored under active character | Emit-all under that character | **Account-family** seal; emit delta under observing character only | Account skill id set + account-family sealed flag |
+| `hero_unlock` | Snapshot `hero_info` | Character | Emit-all catch-up | Per-family seal; emit only new | Hero id set + family sealed flag |
+| `profession_unlock` | Snapshot profession bits | Character | Emit-all catch-up | Per-family seal; emit only new | Profession id set + family sealed flag |
+| `hard_mode_unlock` | Snapshot flag | Character | Emit if unlocked and kind absent | Per-family seal; emit only false→true after seal | HM unlocked bool + family sealed flag |
+| `vanquish_area` | Snapshot vanquish bits | Character | Emit-all catch-up | Per-family seal; emit only new bits | Vanquish map id set + family sealed flag |
+| `cartography_threshold` | Snapshot fog % | Character | Catch-up all thresholds from 0 | Per-family seal; emit only newly crossed thresholds | Use sealed flag + live/snapshot-derived prior % (no dual amount field) |
+| `skill_point_threshold` | Snapshot earned SP | Character | Catch-up from 0 via events | Per-family seal; emit only new crossings | **Single-source:** sealed flag + existing `skill_points_earned` snapshot as prior |
+| `faction_threshold` | Snapshot earned factions | Character | Catch-up from 0 | Per-family seal; emit only new crossings | **Single-source:** sealed flag + existing `faction_totals` snapshot as prior |
+| `hom_points` | Async HoM snapshot | Character envelope | First sample treats previous as 0 → emit all non-zero | **HoM-family** seal; emit only increases after seal | Sealed flag + existing `hall_of_monuments` snapshot as prior |
 | `mission_complete` | UI game message | Character | Event-only (no snapshot catch-up) | Keep | None (timed) |
 | `dungeon_complete` | UI game message | Character | Event-only | Keep | None |
 | `vanquish_complete` | UI game message | Character | Event-only (distinct from permanent `vanquish_area`) | Keep | None |
@@ -81,47 +90,90 @@ Priors for unlocks/thresholds are reconstructed from **already emitted** `journe
 
 ### 3.1 Concepts
 
-Per tracked identity, distinguish:
+Per **flood family** (not one global character seal), distinguish:
 
 | State | Meaning |
 |-------|---------|
-| `Unset` | Never sealed for this kind family; missing context or never sampled |
-| `Sealed` | Baseline captured; may have zero unlocks; **no** milestone implied |
-| `DeltaObserved` | After seal, a new id/threshold/flag appeared → append journey event and advance baseline |
+| `Unset` | This family never sealed; missing context, incomplete sample, or never sampled |
+| `Sealed` | Baseline captured for this family; may have zero unlocks; **no** milestone implied |
+| `DeltaObserved` | After seal, a new id/threshold/flag appeared → append journey event and advance that family’s baseline set / snapshot prior |
 
 Do **not** encode Sealed as a journey event.
 
-### 3.2 Suggested persisted fields (additive)
+### 3.2 Flood families (C2)
+
+Seal independently (each `Unset` | `Sealed`, optional audit timestamp for debugging only):
+
+| Family | Scope | Covers kinds / priors |
+|--------|-------|------------------------|
+| `maps` | Character | `map_unlock` |
+| `character_skills` | Character | `skill_unlock` |
+| `heroes` | Character | `hero_unlock` |
+| `professions` | Character | `profession_unlock` |
+| `hard_mode` | Character | `hard_mode_unlock` |
+| `vanquish` | Character | `vanquish_area` |
+| `cartography` | Character | `cartography_threshold` |
+| `skill_points` | Character | `skill_point_threshold` |
+| `faction` | Character | `faction_threshold` |
+| `hom` | Character envelope | `hom_points` |
+| `account_skills` | Account | `account_skill_unlock` |
+
+Title / level / map_enter / timed clears are **not** flood-baseline families (existing suppress or event-only behavior).
+
+**Rejected:** a single sticky `journeyBaselineSealedAt` that seals all families together.
+
+### 3.3 Suggested persisted fields (additive)
 
 On `StoredCharacter` (illustrative names):
 
-- `journeyBaselineSealedAt` (UTC optional) — character unlock/threshold families sealed together when first complete sample succeeds
-- `baselineUnlockedMaps` / `baselineUnlockedSkills` / `baselineHeroes` / `baselineProfessions` / `baselineVanquishedMaps` — id sets or compact bit encodings
-- `baselineHardModeUnlocked` — optional bool
-- `baselineCartographyPercent` — optional uint
-- `baselineSkillPointsEarned` / `baselineFactionTotals` — optional mirrors for threshold priors (may overlap existing snapshot fields; baseline seal time still needed so first sample does not emit)
+- Per character flood family: `*BaselineState` = `Unset` | `Sealed` (+ optional `*BaselineSealedAt` audit only)
+- Unlock id sets / bit encodings for families that need them: maps, character skills, heroes, professions, vanquish
+- `hardModeBaseline` bool meaningful only when `hard_mode` family is `Sealed`
+- Threshold / HoM families: **no duplicate amount fields** (W5) — when `Sealed`, builders use existing snapshot fields as prior (`skill_points_earned`, `faction_totals`, `hall_of_monuments`, and cartography prior derived from last sealed observation policy below)
 
 On `AccountProgressStore`:
 
-- `accountJourneyBaselineSealedAt`
-- `baselineAccountSkills` — account skill ids
+- `accountSkillsBaselineState` = `Unset` | `Sealed` (+ optional audit ts)
+- `baselineAccountSkills` — account skill ids (needed; no existing account snapshot array on Contract/store today)
 
-Existing fields keep their roles: `titles`, `last_known_level`, `last_map_id`, `hall_of_monuments`, `journey_events` (append-only milestones only).
+Existing fields keep their roles: `titles`, `last_known_level`, `last_map_id`, `hall_of_monuments`, `skill_points_earned`, `faction_totals`, `journey_events` (append-only milestones only).
 
-### 3.3 Sealing rules
+### 3.4 Incomplete first-tick gating (C3) — C++ merge blocker
 
-Seal a family only when:
+Bitset / list **completeness on first Persistent tick remains empirically unknown**. Implementation must still ship an explicit conservative policy; **C++ merge is blocked** until this is coded and tested:
 
-- character identity is bound;
-- world context is ready for that family’s source;
-- for account skills: `game->account` present;
-- sample is non-partial (**unknown** until Live proves partial-bitset behavior — if incomplete lists are possible, do not seal).
+1. **Do not seal** a family when world/account context for that family is missing.
+2. **Do not seal** on empty-or-suspicious unlock samples when the character is not expected to be blank (conservative default: if a previously observed non-empty working set for that family would shrink to empty/near-empty without an explicit “new character” signal, **no seal-on-shrink** — leave `Unset`, emit nothing).
+3. Prefer seal only after a **stable sample** for that family (e.g. same id-set / bit pattern across consecutive eligible polls, or equivalent documented stability check). Exact N and equality rule are implementation detail; default must be conservative.
+4. While `Unset`, builders must **not** fall back to emit-all against empty event priors.
+5. Partial/uncertain → stay `Unset`; never invent confirmed catch-up milestones.
 
-If context missing: leave `Unset`; do not clear prior seal; do not emit catch-up.
+In-game verification still required to validate the stability heuristic against real GWCA behavior.
 
-### 3.4 Delta rules
+### 3.5 Sealing and delta rules
 
-After seal, reuse existing builders with **baseline maps/amounts** as `previous_*` instead of `PriorIdsFromJourneyEvents` for unlock/threshold kinds. Continue fingerprint dedupe via `AppendUniqueJourneyEvents`.
+Seal a family only when §3.4 gates pass and identity is bound.
+
+If context missing or unstable: leave that family `Unset`; do not clear a prior `Sealed`; do not emit catch-up.
+
+After `Sealed`, reuse builders with:
+
+- unlock families → persisted baseline id sets as `previous_*`
+- threshold / HoM families → **existing snapshot fields** as prior amounts (W5)
+- continue fingerprint dedupe via `AppendUniqueJourneyEvents`
+
+### 3.6 W5 — Threshold / HoM single-source
+
+Do **not** dual-write `baselineSkillPointsEarned` / `baselineFactionTotals` / mirrored HoM point fields alongside snapshots.
+
+| Family | Prior after seal |
+|--------|------------------|
+| `skill_points` | `StoredCharacter::skill_points_earned` |
+| `faction` | `StoredCharacter::faction_totals` |
+| `hom` | `StoredCharacter::hall_of_monuments` |
+| `cartography` | Prior max % from last sealed observation stored as the family’s sealed prior **or** derived only from a single cartography baseline field if no snapshot field exists today — still one source, not snapshot+mirror pair |
+
+For cartography, Contract/store today has no dedicated lifetime cartography snapshot field; a **single** sealed prior percent for that family is allowed. Do not also reconstruct threshold catch-up from journey events once sealed.
 
 ---
 
@@ -130,20 +182,24 @@ After seal, reuse existing builders with **baseline maps/amounts** as `previous_
 | Item | Decision |
 |------|----------|
 | Format id | Keep `gwtoolbox-quest-progress` |
-| Version | **Minor bump** `1.1 → 1.2` (additive optional baseline fields). Major bump not required if old readers ignore unknown fields and new readers tolerate absence |
-| Old `1.0` / `1.1` files | Load via existing migrate-to-current path; then baseline fields absent → `Unset` |
+| Version | **Minor bump** `1.1 → 1.2` (additive optional per-family baseline fields). Major bump not required if old readers ignore unknown fields and new readers tolerate absence |
+| Old `1.0` / `1.1` files | Load via existing migrate-to-current path; family states absent → `Unset` |
 | Reject | Newer major still rejected |
 | Journey event schema | Unchanged (Contract v1 payload shape unchanged) |
 | Do not | Rewrite or delete existing `journey_events` during migration |
 
-Migration step for 1.2:
+### W4 — Upgrade atomicity (same ingest)
 
-1. Canonicalize as today.
-2. Leave baseline fields empty.
-3. On **next successful complete sample** after upgrade:
-   - If unlock/threshold journey events already exist for a family, **reconstruct baseline from those event ids/amounts** (and current snapshot), mark sealed, emit **no** new catch-up.
-   - If no such events and complete sample available, seal from snapshot only (preferred for clean/new characters).
-4. Never invent quest completions or delete history.
+Codec migrate `1.1 → 1.2` may only add empty/`Unset` family fields. Catch-up prevention is enforced on **first post-upgrade ingest**, atomically:
+
+1. Enter ingest with family state `Unset`.
+2. **Before** unlock/threshold builders run: if that family has existing unlock/threshold `journey_events`, **reconstruct baseline id set / use snapshot prior, mark `Sealed`, emit nothing**.
+3. Only then run builders for that family (delta-only vs sealed prior).
+4. **Emit-all against empty prior is forbidden** for flood families on this path.
+5. If no prior events and sample fails §3.4 gates → remain `Unset`, still no emit-all.
+6. Never invent quest completions or delete history.
+
+Reconstruction and seal for a family must not be deferred to a later poll after builders have already run once with empty priors.
 
 ---
 
@@ -151,12 +207,12 @@ Migration step for 1.2:
 
 | Component | Change (planned) |
 |-----------|------------------|
-| `QuestCharacterJourney.*` | Add seal-aware wrappers or prior-from-baseline helpers; keep pure builders testable; stop using empty event-derived prior as “emit all” for unlocks when baseline policy active |
-| `QuestProgressLive::SampleLiveJourneySnapshot` | Pass baseline priors; return seal updates + delta events only |
-| `QuestProgressService::IngestJourneySnapshot` / `IngestHomSnapshot` | Persist baseline seal + snapshot fields; append only delta events |
-| `QuestProgressStore` merge | Merge baseline sets by union; sealed flag sticky true once set; do not drop events |
-| `QuestProgressJsonCodec` | 1.2 fields + migrate |
-| `QuestProgressContractExporter` | No Contract schema change; export fewer false milestones; snapshots unchanged |
+| `QuestCharacterJourney.*` | Seal-aware priors per family; keep pure builders testable; forbid empty-prior emit-all when family policy active |
+| `QuestProgressLive::SampleLiveJourneySnapshot` | Per-family stability/seal gates; return seal updates + delta events only |
+| `QuestProgressService::IngestJourneySnapshot` / `IngestHomSnapshot` | **W4 atomic** reconstruct/seal-before-build; persist per-family state; append only deltas; threshold priors from snapshots (W5) |
+| `QuestProgressStore` merge | Per-family: `Sealed` sticky once set; union unlock id sets; do not drop events |
+| `QuestProgressJsonCodec` | 1.2 per-family fields + migrate stub to `Unset` |
+| `QuestProgressContractExporter` | No Contract schema change; fewer false milestones; **no new unlock inventory arrays** (C1) |
 | `QuestProgressReducer` | No journey work |
 | `QuestTrackerWindow` | No automation; may only call updated ingest APIs |
 
@@ -166,23 +222,28 @@ Migration step for 1.2:
 
 - Contract **v1 document unchanged** (this plan forbids editing Contract docs/meaning/version).
 - Producer emits fewer `journeyEvents` on first track of veteran characters.
-- Snapshot fields still carry current lifetime state for Wayfarer.
-- `account_skill_unlock` remains under the character envelope when a **true delta** is observed while that character is active; account baseline prevents per-character re-flood.
+- Snapshot fields still carry current lifetime state where they already exist.
+- **C1:** no map/skill/hero/profession/vanquish unlock inventory snapshot arrays in this phase.
+- `account_skill_unlock` remains under the character envelope when a **true delta** is observed while that character is active; account-family baseline prevents per-character re-flood.
 - Fingerprint / canonical JSON rules unchanged.
-- Existing noisy events already written to disk remain exportable until consumer strategy filters them (see §7–8).
+- Existing noisy events already written to disk remain exportable; display handling is consumer-side (W6).
 
 ---
 
-## 7. Wayfarer UX consequences (no Wayfarer implementation here)
+## 7. Wayfarer UX consequences (W6)
+
+**Toolbox plan non-goal:** no Wayfarer / Codex code in this repository or PR.
 
 Observed today: dossier timeline `entries.take(40)`.
 
-Recommended consumer-only strategies (future Wayfarer work, out of Toolbox scope):
+**Follow-up (Codex repo, separate work):** for **already imported** baseline noise, implement **display collapse** only:
 
-- Prefer quest-progress / session-meaningful kinds when truncating.
-- Collapse same-`observedAt` unlock bursts into a single “Already unlocked when tracking began” summary **for display**, without deleting imported rows.
-- Treat `observedAt` as observation time in copy (avoid “earned at” wording for unlock floods).
-- Do **not** auto-delete or rewrite imported history (append-only / evidence rules).
+- Collapse same-`observedAt` unlock bursts into a summary such as “Already unlocked when tracking began”.
+- Prefer quest/session-meaningful kinds when truncating.
+- Treat `observedAt` as observation time in copy.
+- **DB delete / rewrite of imported rows is forbidden** (append-only evidence).
+
+Toolbox stops creating new floods; it does not clean Codex databases.
 
 ---
 
@@ -190,17 +251,17 @@ Recommended consumer-only strategies (future Wayfarer work, out of Toolbox scope
 
 | Scenario | Behavior |
 |----------|----------|
-| New character, empty store | Seal on first complete sample; few or no unlock events; `map_enter` / later deltas / timed clears as today |
-| Veteran character, first Toolbox session | Seal without unlock catch-up flood |
-| Store wipe / new folder | Same as first session (intentional re-seal; may miss pre-Toolbox history — observational limit) |
-| Upgrade 1.1 → 1.2 with existing unlock flood events | Keep events; reconstruct baseline from them; stop further catch-up |
-| Character switch | Per-character baseline; account skill baseline shared |
+| New character, empty store | Per-family seal on first gated-complete sample; few or no unlock events; `map_enter` / later deltas / timed clears as today |
+| Veteran character, first Toolbox session | Per-family seal without unlock catch-up flood; Life journey shows tracking-start deltas only (C1) |
+| Store wipe / new folder | Same as first session (intentional re-seal; pre-Toolbox unlock inventory not in Contract — C1) |
+| Upgrade 1.1 → 1.2 with existing unlock flood events | Keep events; **W4** reconstruct+seal in same ingest before builders; stop further catch-up |
+| Character switch | Per-character families; account_skills family shared |
 | Account switch | Different `account_key` store file; no cross-account merge |
-| Missing world/account context | No seal; no empty baseline write; no event flood |
-| Play without Toolbox, return later | Next complete sample deltas vs sealed baseline (new unlocks since last seal) |
-| Already-exported Contract files with noise | Immutable producer artifacts; consumer display strategy only |
+| Missing / unstable context | Family stays `Unset`; no empty seal; no emit-all (C3) |
+| Play without Toolbox, return later | Deltas vs sealed families |
+| Already-exported Contract / already-imported Codex noise | Immutable evidence; **W6** Codex display collapse follow-up only |
 
-**History policy for existing noise:** do not erase; do not auto-rewrite evidence; optional consumer display filter only.
+**History policy for existing noise:** do not erase; do not auto-rewrite evidence; Codex display collapse only.
 
 ---
 
@@ -208,15 +269,15 @@ Recommended consumer-only strategies (future Wayfarer work, out of Toolbox scope
 
 | Scenario | Expected |
 |----------|----------|
-| New character first session | Seal near-empty unlock sets; emit real deltas as they happen; title/level as today |
-| Old character first Toolbox session | Seal large unlock sets; **no** mass milestones |
-| Restart with store | Load baseline; quiet unless delta |
-| Restart without store | Re-seal; observational gap accepted |
-| Old store upgrade | §4 + §8 |
-| Character switch | No cross-character quest/journey contamination; account baseline shared |
+| New character first session | Per-family seal when gated; emit real deltas; title/level as today |
+| Old character first Toolbox session | Per-family seal; **no** mass milestones |
+| Restart with store | Load per-family state; quiet unless delta |
+| Restart without store | Re-seal per family; observational gap accepted (C1) |
+| Old store upgrade | §4 W4 atomic reconstruct |
+| Character switch | No cross-character contamination; account_skills shared |
 | Account switch | Separate store |
-| Partial/missing context | Hold seal; unknown completeness → do not seal |
-| Return after offline play | Delta vs last seal |
+| Partial/missing/unstable context | Family `Unset`; no seal; no flood (C3) |
+| Return after offline play | Delta vs sealed families |
 
 ---
 
@@ -224,81 +285,86 @@ Recommended consumer-only strategies (future Wayfarer work, out of Toolbox scope
 
 Pure logic (`QuestProgressTests`):
 
-1. Unlock family: first sample seals, **zero** events; second sample with +1 id → one event.
-2. Same for skills, heroes, professions, vanquish, hard mode.
-3. Account skills: seal on account store; character A first sample no flood; new account skill while on A → one `account_skill_unlock`; character B first sample does not re-emit A’s sealed skills.
-4. Cartography / SP / faction thresholds: seal current max; no catch-up from 0; crossing next threshold emits.
-5. HoM: first successful fetch seals without `hom_points` flood; later point increase emits.
-6. Title/level/map_enter regression: existing tests stay green.
-7. Timed clears unchanged.
-8. Codec 1.1 → 1.2 round-trip preserves journey_events; baseline optional.
-9. Upgrade path: store with pre-existing unlock events → reconstruct baseline → second sample quiet.
-10. Missing account pointer → account skills unset, no empty seal, no flood.
-11. Merge of two memory/disk characters unions baseline ids and keeps sealed.
+1. Per unlock family: first gated sample seals that family, **zero** events; second sample with +1 id → one event.
+2. Families seal independently (e.g. maps sealed, skills still `Unset` when skills context missing).
+3. Account skills: account-family seal; character A no flood; new account skill on A → one event; character B does not re-emit.
+4. Thresholds: sealed + snapshot prior only (no dual baseline amount); no catch-up from 0; crossing emits.
+5. HoM family: first gated fetch seals without `hom_points` flood; later increase emits.
+6. C3: shrink/empty/unstable sample → no seal, no emit-all.
+7. W4: 1.1 store with unlock events → single ingest reconstructs+seals before build → zero new catch-up events.
+8. Title/level/map_enter + timed clears regressions stay green.
+9. Codec 1.1 → 1.2 round-trip preserves `journey_events`; per-family state optional/`Unset`.
+10. Missing account pointer → account_skills `Unset`, no flood.
+11. Merge: per-family `Sealed` sticky; unlock id sets unioned; events kept.
 
-Service-level (if harness allows): `IngestJourneySnapshot` does not append catch-up when sealing.
+**Not unit-testable here:** real GWCA first-tick completeness — remains **unknown**; in-game checklist still required after C3 policy is implemented.
 
-**Not unit-testable here:** GWCA bitset completeness on first tick — mark **unknown**; gate with in-game verification checklist.
-
-Regression: exporter still emits valid Contract v1; fixture-style export tests remain green.
+Regression: exporter valid Contract v1; no unlock inventory arrays added (C1).
 
 ---
 
 ## 11. Implementation slices (order)
 
-1. **Domain + codec 1.2** — baseline structs, serialize/parse, migrate stub, tests.
-2. **Journey priors from baseline** — change Live/Service wiring for unlock kinds; pure tests for seal/delta.
-3. **Thresholds + cartography + hard mode** — same pattern.
-4. **Account skill baseline** on `AccountProgressStore`.
-5. **HoM seal-on-first-fetch** without point flood.
-6. **Upgrade reconstruction** from existing journey_events.
-7. **Store merge** rules for baseline.
-8. **In-game verification** checklist (Pre-Searing + veteran post-Searing unlock-heavy character).
-9. **Wayfarer display follow-up** (separate repo/PR; not this plan’s code).
+1. **Domain + codec 1.2** — per-family state enums, unlock id sets, migrate to `Unset`, tests.
+2. **W4 ingest atomicity** — reconstruct/seal-before-build helper + tests (merge blocker with C3).
+3. **C3 gating** — stability / no-seal-on-shrink / no emit-all while `Unset` (merge blocker).
+4. **Unlock family priors** — Live/Service wiring; seal/delta tests.
+5. **Thresholds + cartography + hard mode** — W5 single-source priors.
+6. **Account skill family** on `AccountProgressStore`.
+7. **HoM family** seal-on-first-gated-fetch.
+8. **Store merge** per-family rules.
+9. **In-game verification** checklist (Pre-Searing + unlock-heavy post-Searing).
+10. **Wayfarer/Codex display collapse** — separate repo/PR (W6); not Toolbox.
 
-Do not combine with unlock-array Contract expansions or automation.
+Do not combine with unlock-array Contract expansions (C1 future sync) or automation.
 
 ---
 
 ## 12. Risks and open questions
 
-### Decided (from code)
+### Decided
 
-- Unlock/threshold first sample is emit-all vs empty event-derived prior.
-- Title/level already suppress-until-delta.
-- Timed clears are game-message driven.
+- Unlock/threshold first sample today is emit-all vs empty event-derived prior.
+- Title/level already suppress-until-delta; timed clears are game-message driven.
 - Store minor is 1.1; journey has no source/confidence.
 - Account skills are sampled from account context but stored under the active character’s `journey_events`.
 - Wayfarer UI truncates timeline to 40 entries.
+- **C1:** accept no unlock inventory snapshot arrays for now; Life journey = since tracking; enrichment = future Contract sync.
+- **C2:** per-family `Unset` \| `Sealed` (not one global sticky seal).
+- **C3:** conservative no-seal-on-partial/empty/shrink policy is required; C++ merge blocker until implemented.
+- **W4:** upgrade reconstruct+seal runs in the same ingest before builders; emit-all forbidden.
+- **W5:** threshold/HoM priors are sealed flag + existing snapshot (no dual amount write).
+- **W6:** already-imported noise → Codex display collapse follow-up; no DB delete; Wayfarer code is Toolbox non-goal.
 - Contaminated-store hygiene doc is about quest identity contamination, not journey baseline.
 
 ### Unknown (not invent)
 
-- Whether unlock bitsets/lists can be incomplete on the first Persistent tick after map load.
+- Whether unlock bitsets/lists can be incomplete on the first Persistent tick after map load (policy in C3 still required).
 - Whether `hero_info` / profession masks can temporarily omit owned entries.
 - Ordering races between HoM async fetch and live unlock sampling.
-- Whether Codex should ever soft-hide historical producer noise beyond UX truncation (product decision).
+- Exact stability-check parameters (N polls / equality) — implement conservatively, tune with in-game evidence.
 - Exact compact encoding for large bitsets on disk (implementation detail).
-- Whether `map_enter` on very first sample should remain (recommended keep; not the flood problem).
+- Whether `map_enter` on very first sample should change (recommended keep; not the flood problem).
 
 ### Risks
 
-- Sealing on incomplete bitsets could suppress later “new” unlocks that were only late-loaded (**unknown** completeness).
-- Reconstructing baseline from noisy events keeps bad timestamps in history (accepted; display-only mitigation).
+- Over-conservative C3 gating delays seal and therefore delays legitimate delta emission until stability is met (accepted vs false catch-up).
+- Reconstructing baseline from noisy events keeps bad timestamps in history (accepted; W6 display-only mitigation).
 - Account baseline in store is a new persistence surface; must not break accountKey validation.
+- C1 tradeoff: users cannot see full pre-Toolbox unlock inventory via Contract until a future synced enrichment.
 
 ---
 
 ## 13. Explicit non-goals
 
 - Production C++ in this documentation PR
-- Contract v1 schema / meaning / version changes
+- Contract v1 schema / meaning / version changes (including unlock inventory arrays — C1 future sync)
 - Automatic deletion or rewrite of existing journey evidence
+- Codex/Wayfarer code changes in this Toolbox plan (W6 follow-up is separate)
+- DB delete of already-imported journey rows
 - Quest acceptance / movement / combat / reward automation
-- Wayfarer code changes in this task
 - Festival hats, deaths, gold-as-progress, PvP W/L journey kinds
-- Exporting full unlock snapshot arrays (previously deferred enrichment)
-- Unlock-baseline implementation merge without senior architecture approval
+- Unlock-baseline implementation merge without senior architecture approval and without C3/W4 gates satisfied
 
 ---
 
@@ -306,13 +372,13 @@ Do not combine with unlock-array Contract expansions or automation.
 
 1. **Snapshot-derived:** title, level, map_enter, vanquish_area, map/skill/account_skill/hero/profession unlock, hard_mode, cartography, SP/faction thresholds, hom_points. **Timed game messages:** mission/dungeon/vanquish_complete.
 2. **Mass baseline:** unlock + vanquish_area + threshold + hom_points families above.
-3. **Character vs account:** account skills are account-semantic; everything else listed is character (or character-envelope HoM).
+3. **Character vs account:** account skills are account-family; other flood families are character (HoM character-envelope).
 4. **Store today:** cannot distinguish never-observed vs baseline-without-milestone vs new-since-baseline for unlocks; events double as prior.
-5. **Needed baseline:** explicit sealed id sets / flags / max amounts (+ account skill set), separate from milestones.
+5. **Needed baseline:** per-family sealed state + unlock id sets; thresholds use sealed + existing snapshots (W5).
 6. **Version:** store **minor** 1.2; major not required for additive fields.
-7. **Old files:** load, migrate minor, reconstruct or seal on next sample; keep all events.
-8. **Existing noise:** retain; no auto-rewrite; consumer display strategy only.
-9. **Account unlocks:** account-level baseline; Contract still nests delta events under the observing character.
+7. **Old files:** load, migrate minor, W4 reconstruct/seal on first ingest; keep all events.
+8. **Existing noise:** retain; no auto-rewrite; **W6** Codex display collapse only.
+9. **Account unlocks:** account-family baseline; Contract still nests delta events under the observing character.
 10. **Append-only:** seal without appending; deltas append; history never erased.
 11. **Scenarios:** see §9.
 12. **Tests:** see §10.
