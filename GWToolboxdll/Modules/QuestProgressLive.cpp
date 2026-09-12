@@ -214,65 +214,40 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
         out.new_events,
         BuildMapEnterEvents(previous_map_id, current_map_id, existing_events, observed_at));
 
-    const MissionBitsetWords vanquished{
-        world->vanquished_areas.m_buffer,
-        world->vanquished_areas.m_size,
-    };
-    AppendUniqueJourneyEvents(
-        out.new_events,
-        BuildVanquishAreaEvents(
-            PriorIdsFromJourneyEvents(existing_events, "vanquish_area"),
-            CollectSetBitMapIds(vanquished),
-            existing_events,
-            observed_at));
+    out.raw_flood.observed_at = observed_at;
 
     const MissionBitsetWords unlocked_maps{
         world->unlocked_map.m_buffer,
         world->unlocked_map.m_size,
     };
-    AppendUniqueJourneyEvents(
-        out.new_events,
-        BuildNewlySeenIdEvents(
-            "map_unlock",
-            JourneyUnlockIdKind::Map,
-            PriorIdsFromJourneyEvents(existing_events, "map_unlock"),
-            CollectSetBitMapIds(unlocked_maps),
-            existing_events,
-            observed_at));
+    out.raw_flood.maps = MakeRawIdSetFamilyObservation(
+        true,
+        true,
+        CollectSetBitMapIds(unlocked_maps));
 
     const MissionBitsetWords unlocked_skills{
         world->unlocked_character_skills.m_buffer,
         world->unlocked_character_skills.m_size,
     };
-    AppendUniqueJourneyEvents(
-        out.new_events,
-        BuildNewlySeenIdEvents(
-            "skill_unlock",
-            JourneyUnlockIdKind::Skill,
-            PriorIdsFromJourneyEvents(existing_events, "skill_unlock"),
-            CollectSetBitMapIds(unlocked_skills),
-            existing_events,
-            observed_at));
+    out.raw_flood.character_skills = MakeRawIdSetFamilyObservation(
+        true,
+        true,
+        CollectSetBitMapIds(unlocked_skills));
 
     if (const auto* account = game->account) {
-            std::vector<uint32_t> account_skill_ids;
-            account_skill_ids.reserve(account->unlocked_account_skills.size());
-            for (size_t i = 0; i < account->unlocked_account_skills.size(); ++i) {
-                const auto skill_id = account->unlocked_account_skills[i];
-                if (skill_id != 0) {
-                    account_skill_ids.push_back(skill_id);
-                }
+        std::vector<uint32_t> account_skill_ids;
+        account_skill_ids.reserve(account->unlocked_account_skills.size());
+        for (size_t i = 0; i < account->unlocked_account_skills.size(); ++i) {
+            const auto skill_id = account->unlocked_account_skills[i];
+            if (skill_id != 0) {
+                account_skill_ids.push_back(skill_id);
             }
-            AppendUniqueJourneyEvents(
-                out.new_events,
-                BuildNewlySeenIdEvents(
-                    "account_skill_unlock",
-                    JourneyUnlockIdKind::Skill,
-                    PriorIdsFromJourneyEvents(existing_events, "account_skill_unlock"),
-                    account_skill_ids,
-                    existing_events,
-                    observed_at));
         }
+        out.raw_flood.account_skills = MakeRawIdSetFamilyObservation(
+            true,
+            true,
+            std::move(account_skill_ids));
+    }
 
     std::vector<uint32_t> hero_ids;
     hero_ids.reserve(world->hero_info.size());
@@ -282,23 +257,21 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
             hero_ids.push_back(hero_id);
         }
     }
-    AppendUniqueJourneyEvents(
-        out.new_events,
-        BuildNewlySeenIdEvents(
-            "hero_unlock",
-            JourneyUnlockIdKind::Hero,
-            PriorIdsFromJourneyEvents(existing_events, "hero_unlock"),
-            hero_ids,
-            existing_events,
-            observed_at));
+    out.raw_flood.heroes = MakeRawIdSetFamilyObservation(true, true, std::move(hero_ids));
 
-    AppendUniqueJourneyEvents(
-        out.new_events,
-        BuildHardModeUnlockEvents(
-            HasJourneyKind(existing_events, "hard_mode_unlock"),
-            world->is_hard_mode_unlocked != 0,
-            existing_events,
-            observed_at));
+    out.raw_flood.hard_mode = MakeRawFlagFamilyObservation(
+        true,
+        true,
+        world->is_hard_mode_unlocked != 0);
+
+    const MissionBitsetWords vanquished{
+        world->vanquished_areas.m_buffer,
+        world->vanquished_areas.m_size,
+    };
+    out.raw_flood.vanquish_areas = MakeRawIdSetFamilyObservation(
+        true,
+        true,
+        CollectSetBitMapIds(vanquished));
 
     if (const auto* player = GW::PlayerMgr::GetPlayerByID()) {
         const GW::ProfessionState* found = nullptr;
@@ -315,77 +288,49 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
                     profession_ids.push_back(prof);
                 }
             }
-            AppendUniqueJourneyEvents(
-                out.new_events,
-                BuildNewlySeenIdEvents(
-                    "profession_unlock",
-                    JourneyUnlockIdKind::Profession,
-                    PriorIdsFromJourneyEvents(existing_events, "profession_unlock"),
-                    profession_ids,
-                    existing_events,
-                    observed_at));
+            out.raw_flood.professions = MakeRawIdSetFamilyObservation(
+                true,
+                true,
+                std::move(profession_ids));
         }
     }
 
     const auto* carto_bits = reinterpret_cast<const uint32_t*>(world->cartographed_areas.m_buffer);
-    const auto carto_pct = ComputeCartographyCoveragePercent(
+    const auto carto_dword_count = world->cartographed_areas.size();
+    const auto carto_width = world->h05B4[0];
+    const auto carto_height = world->h05B4[1];
+    const auto carto_usable = IsCartographyBufferUsable(
         carto_bits,
-        world->cartographed_areas.size(),
-        world->h05B4[0],
-        world->h05B4[1]);
-    AppendUniqueJourneyEvents(
-        out.new_events,
-        BuildCartographyThresholdEvents(
-            MaxCartographyPercentFromEvents(existing_events),
-            carto_pct,
-            current_map_id,
-            existing_events,
-            observed_at));
+        carto_dword_count,
+        carto_width,
+        carto_height);
+    out.raw_flood.cartography = MakeRawPercentFamilyObservation(
+        true,
+        carto_usable,
+        carto_usable
+            ? ComputeCartographyCoveragePercent(
+                carto_bits,
+                carto_dword_count,
+                carto_width,
+                carto_height)
+            : 0u);
 
-    static const std::vector<uint32_t> kSkillPointThresholds{
-        1, 5, 10, 25, 50, 75, 100, 150, 200, 250, 300};
-    AppendUniqueJourneyEvents(
-        out.new_events,
-        BuildAbsoluteThresholdEvents(
-            "skill_point_threshold",
-            "skill_points",
-            MaxAmountFromJourneyEvents(existing_events, "skill_point_threshold", "skill_points"),
-            world->total_earned_skill_points,
-            kSkillPointThresholds,
-            existing_events,
-            observed_at));
+    out.raw_flood.skill_points = MakeRawAmountFamilyObservation(
+        true,
+        true,
+        world->total_earned_skill_points);
 
-    static const std::vector<uint32_t> kFactionThresholds{
-        1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000};
-    const struct {
-        const char* prefix;
-        uint32_t value;
-    } factions[] = {
-        {"faction:kurzick", world->total_earned_kurzick},
-        {"faction:luxon", world->total_earned_luxon},
-        {"faction:balthazar", world->total_earned_balth},
-        {"faction:imperial", world->total_earned_imperial},
-    };
-    for (const auto& faction : factions) {
-        AppendUniqueJourneyEvents(
-            out.new_events,
-            BuildAbsoluteThresholdEvents(
-                "faction_threshold",
-                faction.prefix,
-                MaxAmountFromJourneyEvents(existing_events, "faction_threshold", faction.prefix),
-                faction.value,
-                kFactionThresholds,
-                existing_events,
-                observed_at));
-    }
-
-    out.experience_total = world->experience;
-    out.skill_points_earned = world->total_earned_skill_points;
     FactionTotalsRecord factions_snapshot;
     factions_snapshot.kurzick = world->total_earned_kurzick;
     factions_snapshot.luxon = world->total_earned_luxon;
     factions_snapshot.balthazar = world->total_earned_balth;
     factions_snapshot.imperial = world->total_earned_imperial;
+    out.raw_flood.factions = MakeRawFactionFamilyObservation(true, true, factions_snapshot);
+
+    NormalizeRawJourneyFloodObservation(out.raw_flood);
+
+    out.experience_total = world->experience;
+    out.skill_points_earned = world->total_earned_skill_points;
     out.faction_totals = factions_snapshot;
 
     return out;
