@@ -2,6 +2,7 @@
 
 #include <Modules/QuestProgressDomain.h>
 
+#include <algorithm>
 #include <bit>
 #include <format>
 #include <set>
@@ -293,13 +294,169 @@ std::vector<JourneyEventRecord> BuildHardModeUnlockEvents(
     return out;
 }
 
+void CanonicalizeSortedUniqueIds(std::vector<uint32_t>& ids)
+{
+    std::sort(ids.begin(), ids.end());
+    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
+}
+
+void NormalizeRawIdSetFamilyObservation(RawIdSetFamilyObservation& family)
+{
+    if (!family.context_available) {
+        family.sample_usable = false;
+        family.value.clear();
+        return;
+    }
+    if (!family.sample_usable) {
+        family.value.clear();
+        return;
+    }
+    CanonicalizeSortedUniqueIds(family.value);
+}
+
+void NormalizeRawFlagFamilyObservation(RawFlagFamilyObservation& family)
+{
+    if (!family.context_available) {
+        family.sample_usable = false;
+        family.value = false;
+        return;
+    }
+    if (!family.sample_usable) {
+        family.value = false;
+    }
+}
+
+void NormalizeRawPercentFamilyObservation(RawPercentFamilyObservation& family)
+{
+    if (!family.context_available) {
+        family.sample_usable = false;
+        family.value = 0;
+        return;
+    }
+    if (!family.sample_usable) {
+        family.value = 0;
+    }
+}
+
+void NormalizeRawAmountFamilyObservation(RawAmountFamilyObservation& family)
+{
+    if (!family.context_available) {
+        family.sample_usable = false;
+        family.value = 0;
+        return;
+    }
+    if (!family.sample_usable) {
+        family.value = 0;
+    }
+}
+
+void NormalizeRawFactionFamilyObservation(RawFactionFamilyObservation& family)
+{
+    if (!family.context_available) {
+        family.sample_usable = false;
+        family.value = FactionTotalsRecord{};
+        return;
+    }
+    if (!family.sample_usable) {
+        family.value = FactionTotalsRecord{};
+    }
+}
+
+void NormalizeRawJourneyFloodObservation(RawJourneyFloodObservation& observation)
+{
+    NormalizeRawIdSetFamilyObservation(observation.maps);
+    NormalizeRawIdSetFamilyObservation(observation.character_skills);
+    NormalizeRawIdSetFamilyObservation(observation.account_skills);
+    NormalizeRawIdSetFamilyObservation(observation.heroes);
+    NormalizeRawIdSetFamilyObservation(observation.professions);
+    NormalizeRawFlagFamilyObservation(observation.hard_mode);
+    NormalizeRawIdSetFamilyObservation(observation.vanquish_areas);
+    NormalizeRawPercentFamilyObservation(observation.cartography);
+    NormalizeRawAmountFamilyObservation(observation.skill_points);
+    NormalizeRawFactionFamilyObservation(observation.factions);
+}
+
+RawIdSetFamilyObservation MakeRawIdSetFamilyObservation(
+    bool context_available,
+    bool sample_usable,
+    std::vector<uint32_t> ids)
+{
+    RawIdSetFamilyObservation family;
+    family.context_available = context_available;
+    family.sample_usable = sample_usable;
+    family.value = std::move(ids);
+    NormalizeRawIdSetFamilyObservation(family);
+    return family;
+}
+
+RawFlagFamilyObservation MakeRawFlagFamilyObservation(
+    bool context_available,
+    bool sample_usable,
+    bool value)
+{
+    RawFlagFamilyObservation family;
+    family.context_available = context_available;
+    family.sample_usable = sample_usable;
+    family.value = value;
+    NormalizeRawFlagFamilyObservation(family);
+    return family;
+}
+
+RawPercentFamilyObservation MakeRawPercentFamilyObservation(
+    bool context_available,
+    bool sample_usable,
+    uint32_t percent)
+{
+    RawPercentFamilyObservation family;
+    family.context_available = context_available;
+    family.sample_usable = sample_usable;
+    family.value = percent;
+    NormalizeRawPercentFamilyObservation(family);
+    return family;
+}
+
+RawAmountFamilyObservation MakeRawAmountFamilyObservation(
+    bool context_available,
+    bool sample_usable,
+    uint32_t amount)
+{
+    RawAmountFamilyObservation family;
+    family.context_available = context_available;
+    family.sample_usable = sample_usable;
+    family.value = amount;
+    NormalizeRawAmountFamilyObservation(family);
+    return family;
+}
+
+RawFactionFamilyObservation MakeRawFactionFamilyObservation(
+    bool context_available,
+    bool sample_usable,
+    FactionTotalsRecord totals)
+{
+    RawFactionFamilyObservation family;
+    family.context_available = context_available;
+    family.sample_usable = sample_usable;
+    family.value = totals;
+    NormalizeRawFactionFamilyObservation(family);
+    return family;
+}
+
+bool IsCartographyBufferUsable(
+    const uint32_t* bits,
+    size_t dword_count,
+    uint32_t width,
+    uint32_t height)
+{
+    return bits != nullptr && dword_count > 0 && width > 0 && height > 0;
+}
+
 uint32_t ComputeCartographyCoveragePercent(
     const uint32_t* bits,
     size_t dword_count,
     uint32_t width,
     uint32_t height)
 {
-    if (!bits || dword_count == 0 || width == 0 || height == 0) {
+    if (!IsCartographyBufferUsable(bits, dword_count, width, height)) {
         return 0;
     }
     const uint64_t total_bits = static_cast<uint64_t>(width) * static_cast<uint64_t>(height);
