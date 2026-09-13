@@ -86,8 +86,6 @@ IdSetBaselineTransitionResult TransitionIdSetUnset(
     const RawIdSetFamilyObservation& observation,
     const IdSetJourneyBaseline& previous_baseline,
     const IdSetBaselineCandidate& previous_candidate,
-    const std::vector<JourneyEventRecord>& existing_events,
-    std::string_view kind,
     std::string_view observed_at_utc)
 {
     IdSetBaselineTransitionResult out;
@@ -132,8 +130,7 @@ IdSetBaselineTransitionResult TransitionIdSetUnset(
         return out;
     }
 
-    auto sealed_ids = LegacyIdsFromEvents(existing_events, kind);
-    UnionSortedUniqueInto(sealed_ids, out.candidate.seen_union);
+    auto sealed_ids = out.candidate.seen_union;
     UnionSortedUniqueInto(sealed_ids, current);
     out.baseline.state = JourneyBaselineSealState::Sealed;
     out.baseline.ids = std::move(sealed_ids);
@@ -173,6 +170,9 @@ IdSetBaselineTransitionResult TransitionIdSetSealed(
     }
 
     auto prior = PriorMapFromIds(out.baseline.ids);
+    for (const auto id : LegacyIdsFromEvents(existing_events, kind)) {
+        prior[id] = true;
+    }
     out.new_events = BuildNewlySeenIdEvents(
         kind,
         id_kind,
@@ -210,8 +210,6 @@ IdSetBaselineTransitionResult TransitionIdSetJourneyBaseline(
         observation,
         previous_baseline,
         previous_candidate,
-        existing_events,
-        kind,
         observed_at_utc);
 }
 

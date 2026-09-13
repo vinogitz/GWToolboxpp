@@ -335,6 +335,11 @@ void TestZeroIdNeverSealsOrFalseDelta()
     }
     Expect(step.baseline.state == JourneyBaselineSealState::Unset, "zero_bitset_no_seal");
 
+    step = SealMapsAfterThree({0, 42});
+    Expect(step.baseline.state == JourneyBaselineSealState::Sealed, "mixed_zero_real_seals");
+    Expect(step.baseline.ids.size() == 1 && step.baseline.ids[0] == 42, "mixed_zero_real_baseline");
+    Expect(step.new_events.empty(), "mixed_zero_real_bootstrap_zero_events");
+
     step = SealMapsAfterThree({42});
     Expect(step.baseline.state == JourneyBaselineSealState::Sealed, "real_id_after_zero_seals");
     Expect(step.baseline.ids.size() == 1 && step.baseline.ids[0] == 42, "real_id_baseline");
@@ -363,6 +368,38 @@ void TestSealedPartialSampleNoEmitNoExpand()
     Expect(full.baseline.ids[2] == 30, "full_baseline_has_30");
 }
 
+void TestLegacyOrphanDoesNotBlockPostSealDelta()
+{
+    std::vector<JourneyEventRecord> history;
+    JourneyEventRecord orphan;
+    orphan.kind = "map_unlock";
+    orphan.subject_key = BuildMapSubjectKey(99);
+    orphan.observed_at = "2026-01-01T00:00:00.000Z";
+    orphan.map_id = 99;
+    history.push_back(orphan);
+
+    auto sealed = SealMapsAfterThree({10, 20}, history);
+    Expect(sealed.baseline.state == JourneyBaselineSealState::Sealed, "orphan_sealed");
+    Expect(sealed.baseline.ids.size() == 2, "orphan_live_inventory_size");
+    Expect(sealed.baseline.ids[0] == 10 && sealed.baseline.ids[1] == 20, "orphan_live_inventory_ids");
+    Expect(sealed.new_events.empty(), "orphan_bootstrap_zero_events");
+
+    auto delta = StepMaps(UsableIds({10, 20, 30}), sealed.baseline, sealed.candidate, history, kTs4);
+    Expect(delta.new_events.size() == 1, "orphan_one_event");
+    Expect(delta.new_events[0].map_id == 30, "orphan_id_30");
+    Expect(delta.baseline.ids.size() == 3, "orphan_baseline_grew");
+
+    auto resurface = StepMaps(
+        UsableIds({10, 20, 30, 99}),
+        delta.baseline,
+        delta.candidate,
+        history,
+        kTs4);
+    Expect(resurface.new_events.empty(), "orphan_legacy_no_reflood");
+    Expect(resurface.baseline.ids.size() == 4, "orphan_legacy_absorbed_live");
+    Expect(resurface.baseline.ids[3] == 99, "orphan_legacy_in_inventory");
+}
+
 } // namespace
 
 void RunJourneyBaselineTransitionTests()
@@ -378,4 +415,5 @@ void RunJourneyBaselineTransitionTests()
     TestHardModeLegacyTruePreserved();
     TestZeroIdNeverSealsOrFalseDelta();
     TestSealedPartialSampleNoEmitNoExpand();
+    TestLegacyOrphanDoesNotBlockPostSealDelta();
 }
