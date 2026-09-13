@@ -272,7 +272,96 @@ void TestCartographyUsabilityHelper()
     Expect(!IsCartographyBufferUsable(bits, 1, 8, 0), "carto_usable_height");
 }
 
-} // namespace
+void TestStructuralBitsetAndListUsability()
+{
+    Expect(!IsBitsetStorageUsable(nullptr, 4), "bitset_null_unusable");
+    Expect(!IsBitsetStorageUsable(nullptr, 0), "bitset_null_zero_unusable");
+    const uint32_t empty_words[1] = {0};
+    Expect(!IsBitsetStorageUsable(empty_words, 0), "bitset_zero_length_unusable");
+    Expect(IsBitsetStorageUsable(empty_words, 1), "bitset_zero_content_storage_usable");
+
+    const auto null_bitset = AssembleRawIdSetBitsetObservation(true, nullptr, 4);
+    Expect(null_bitset.context_available, "bitset_null_ctx");
+    Expect(!null_bitset.sample_usable, "bitset_null_usable");
+    Expect(null_bitset.value.empty(), "bitset_null_payload");
+
+    const auto zero_len = AssembleRawIdSetBitsetObservation(true, empty_words, 0);
+    Expect(zero_len.context_available, "bitset_zero_ctx");
+    Expect(!zero_len.sample_usable, "bitset_zero_usable");
+    Expect(zero_len.value.empty(), "bitset_zero_payload");
+
+    const uint32_t words[2] = {0x2u, 0x1u};
+    const auto readable = AssembleRawIdSetBitsetObservation(true, words, 2);
+    Expect(readable.context_available && readable.sample_usable, "bitset_readable_usable");
+    Expect(readable.value.size() == 2, "bitset_readable_count");
+    Expect(readable.value[0] == 1 && readable.value[1] == 32, "bitset_readable_sorted_ids");
+
+    Expect(IsListStorageUsable(nullptr, 0), "list_empty_usable");
+    Expect(!IsListStorageUsable(nullptr, 3), "list_null_positive_unusable");
+    const uint32_t list_ids[3] = {9, 1, 9};
+    Expect(IsListStorageUsable(list_ids, 3), "list_buffer_usable");
+
+    const auto bad_list = AssembleRawIdSetListObservation(
+        true,
+        IsListStorageUsable(nullptr, 3),
+        {9, 1, 9});
+    Expect(bad_list.context_available, "list_bad_ctx");
+    Expect(!bad_list.sample_usable, "list_bad_usable");
+    Expect(bad_list.value.empty(), "list_bad_not_observed_empty");
+
+    const auto good_list = AssembleRawIdSetListObservation(
+        true,
+        IsListStorageUsable(list_ids, 3),
+        {9, 1, 9});
+    Expect(good_list.sample_usable, "list_good_usable");
+    Expect(good_list.value.size() == 2, "list_good_unique");
+    Expect(good_list.value[0] == 1 && good_list.value[1] == 9, "list_good_sorted");
+
+    RawJourneyFloodObservation observation;
+    observation.observed_at = "2026-09-12T12:00:00.000Z";
+    observation.maps = AssembleRawIdSetBitsetObservation(true, words, 2);
+    observation.character_skills = AssembleRawIdSetBitsetObservation(true, nullptr, 2);
+    observation.vanquish_areas = AssembleRawIdSetBitsetObservation(true, empty_words, 0);
+    observation.heroes = AssembleRawIdSetListObservation(
+        true,
+        IsListStorageUsable(list_ids, 3),
+        {7, 2});
+    observation.account_skills = AssembleRawIdSetListObservation(
+        true,
+        IsListStorageUsable(nullptr, 2),
+        {4});
+    observation.hard_mode = MakeRawFlagFamilyObservation(true, true, true);
+    NormalizeRawJourneyFloodObservation(observation);
+
+    Expect(observation.maps.sample_usable, "struct_maps_usable");
+    Expect(
+        observation.character_skills.context_available && !observation.character_skills.sample_usable
+            && observation.character_skills.value.empty(),
+        "struct_skills_only_unusable");
+    Expect(
+        observation.vanquish_areas.context_available && !observation.vanquish_areas.sample_usable
+            && observation.vanquish_areas.value.empty(),
+        "struct_vanquish_only_unusable");
+    Expect(observation.heroes.sample_usable, "struct_heroes_usable");
+    Expect(
+        observation.account_skills.context_available && !observation.account_skills.sample_usable
+            && observation.account_skills.value.empty(),
+        "struct_account_unusable_independent");
+    Expect(observation.hard_mode.sample_usable && observation.hard_mode.value, "struct_hm_unaffected");
+
+    RawJourneyFloodObservation reverse;
+    reverse.maps = AssembleRawIdSetBitsetObservation(true, nullptr, 1);
+    reverse.account_skills = AssembleRawIdSetListObservation(
+        true,
+        IsListStorageUsable(list_ids, 3),
+        {4, 4});
+    NormalizeRawJourneyFloodObservation(reverse);
+    Expect(!reverse.maps.sample_usable && reverse.maps.value.empty(), "struct_char_fail_independent");
+    Expect(reverse.account_skills.sample_usable && reverse.account_skills.value.size() == 1,
+        "struct_account_ok_independent");
+}
+
+}
 
 void RunJourneyRawObservationTests()
 {
@@ -284,4 +373,5 @@ void RunJourneyRawObservationTests()
     TestRawFloodIngestCreatesNoEventsAndLeavesBaselinesUnset();
     TestNonFloodEventsStillIngest();
     TestCartographyUsabilityHelper();
+    TestStructuralBitsetAndListUsability();
 }

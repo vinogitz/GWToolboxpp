@@ -450,6 +450,54 @@ bool IsCartographyBufferUsable(
     return bits != nullptr && dword_count > 0 && width > 0 && height > 0;
 }
 
+bool IsBitsetStorageUsable(const uint32_t* words, size_t word_count)
+{
+    return words != nullptr && word_count > 0;
+}
+
+bool IsListStorageUsable(const void* buffer, size_t element_count)
+{
+    return element_count == 0 || buffer != nullptr;
+}
+
+RawIdSetFamilyObservation AssembleRawIdSetBitsetObservation(
+    bool context_available,
+    const uint32_t* words,
+    size_t word_count)
+{
+    if (!context_available) {
+        return MakeRawIdSetFamilyObservation(false, false, {});
+    }
+    if (!IsBitsetStorageUsable(words, word_count)) {
+        return MakeRawIdSetFamilyObservation(true, false, {});
+    }
+    std::vector<uint32_t> ids;
+    const auto max_id = static_cast<uint32_t>(word_count * 32);
+    ids.reserve(32);
+    for (uint32_t id = 0; id < max_id; ++id) {
+        const auto word_index = id / 32;
+        const auto bit_index = id % 32;
+        if ((words[word_index] & (1u << bit_index)) != 0) {
+            ids.push_back(id);
+        }
+    }
+    return MakeRawIdSetFamilyObservation(true, true, std::move(ids));
+}
+
+RawIdSetFamilyObservation AssembleRawIdSetListObservation(
+    bool context_available,
+    bool storage_usable,
+    std::vector<uint32_t> ids)
+{
+    if (!context_available) {
+        return MakeRawIdSetFamilyObservation(false, false, {});
+    }
+    if (!storage_usable) {
+        return MakeRawIdSetFamilyObservation(true, false, {});
+    }
+    return MakeRawIdSetFamilyObservation(true, true, std::move(ids));
+}
+
 uint32_t ComputeCartographyCoveragePercent(
     const uint32_t* bits,
     size_t dword_count,

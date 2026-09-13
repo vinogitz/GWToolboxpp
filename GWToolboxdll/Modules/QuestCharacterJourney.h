@@ -238,6 +238,19 @@ bool IsCartographyBufferUsable(
     uint32_t width,
     uint32_t height);
 
+bool IsBitsetStorageUsable(const uint32_t* words, size_t word_count);
+bool IsListStorageUsable(const void* buffer, size_t element_count);
+
+RawIdSetFamilyObservation AssembleRawIdSetBitsetObservation(
+    bool context_available,
+    const uint32_t* words,
+    size_t word_count);
+
+RawIdSetFamilyObservation AssembleRawIdSetListObservation(
+    bool context_available,
+    bool storage_usable,
+    std::vector<uint32_t> ids);
+
 uint32_t ComputeCartographyCoveragePercent(
     const uint32_t* bits,
     size_t dword_count,

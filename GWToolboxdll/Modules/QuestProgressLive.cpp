@@ -216,82 +216,88 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
 
     out.raw_flood.observed_at = observed_at;
 
-    const MissionBitsetWords unlocked_maps{
+    out.raw_flood.maps = AssembleRawIdSetBitsetObservation(
+        true,
         world->unlocked_map.m_buffer,
-        world->unlocked_map.m_size,
-    };
-    out.raw_flood.maps = MakeRawIdSetFamilyObservation(
-        true,
-        true,
-        CollectSetBitMapIds(unlocked_maps));
+        world->unlocked_map.m_size);
 
-    const MissionBitsetWords unlocked_skills{
+    out.raw_flood.character_skills = AssembleRawIdSetBitsetObservation(
+        true,
         world->unlocked_character_skills.m_buffer,
-        world->unlocked_character_skills.m_size,
-    };
-    out.raw_flood.character_skills = MakeRawIdSetFamilyObservation(
-        true,
-        true,
-        CollectSetBitMapIds(unlocked_skills));
+        world->unlocked_character_skills.m_size);
 
     if (const auto* account = game->account) {
+        const auto& account_skills = account->unlocked_account_skills;
+        const bool account_skills_usable = account_skills.valid()
+            && IsListStorageUsable(account_skills.m_buffer, account_skills.size());
         std::vector<uint32_t> account_skill_ids;
-        account_skill_ids.reserve(account->unlocked_account_skills.size());
-        for (size_t i = 0; i < account->unlocked_account_skills.size(); ++i) {
-            const auto skill_id = account->unlocked_account_skills[i];
-            if (skill_id != 0) {
-                account_skill_ids.push_back(skill_id);
+        if (account_skills_usable) {
+            account_skill_ids.reserve(account_skills.size());
+            for (size_t i = 0; i < account_skills.size(); ++i) {
+                const auto skill_id = account_skills[i];
+                if (skill_id != 0) {
+                    account_skill_ids.push_back(skill_id);
+                }
             }
         }
-        out.raw_flood.account_skills = MakeRawIdSetFamilyObservation(
+        out.raw_flood.account_skills = AssembleRawIdSetListObservation(
             true,
-            true,
+            account_skills_usable,
             std::move(account_skill_ids));
     }
 
+    const auto& hero_info = world->hero_info;
+    const bool heroes_usable = hero_info.valid()
+        && IsListStorageUsable(hero_info.m_buffer, hero_info.size());
     std::vector<uint32_t> hero_ids;
-    hero_ids.reserve(world->hero_info.size());
-    for (size_t i = 0; i < world->hero_info.size(); ++i) {
-        const auto hero_id = static_cast<uint32_t>(world->hero_info[i].hero_id);
-        if (hero_id != 0) {
-            hero_ids.push_back(hero_id);
+    if (heroes_usable) {
+        hero_ids.reserve(hero_info.size());
+        for (size_t i = 0; i < hero_info.size(); ++i) {
+            const auto hero_id = static_cast<uint32_t>(hero_info[i].hero_id);
+            if (hero_id != 0) {
+                hero_ids.push_back(hero_id);
+            }
         }
     }
-    out.raw_flood.heroes = MakeRawIdSetFamilyObservation(true, true, std::move(hero_ids));
+    out.raw_flood.heroes = AssembleRawIdSetListObservation(
+        true,
+        heroes_usable,
+        std::move(hero_ids));
 
     out.raw_flood.hard_mode = MakeRawFlagFamilyObservation(
         true,
         true,
         world->is_hard_mode_unlocked != 0);
 
-    const MissionBitsetWords vanquished{
+    out.raw_flood.vanquish_areas = AssembleRawIdSetBitsetObservation(
+        true,
         world->vanquished_areas.m_buffer,
-        world->vanquished_areas.m_size,
-    };
-    out.raw_flood.vanquish_areas = MakeRawIdSetFamilyObservation(
-        true,
-        true,
-        CollectSetBitMapIds(vanquished));
+        world->vanquished_areas.m_size);
 
     if (const auto* player = GW::PlayerMgr::GetPlayerByID()) {
-        const GW::ProfessionState* found = nullptr;
-        for (size_t i = 0; i < world->party_profession_states.size(); ++i) {
-            if (world->party_profession_states[i].agent_id == player->agent_id) {
-                found = &world->party_profession_states[i];
-                break;
-            }
-        }
-        if (found) {
-            std::vector<uint32_t> profession_ids;
-            for (uint32_t prof = 1; prof <= 10; ++prof) {
-                if ((found->unlocked_professions >> prof & 1u) != 0) {
-                    profession_ids.push_back(prof);
+        const auto& profession_states = world->party_profession_states;
+        const bool profession_states_usable = profession_states.valid()
+            && IsListStorageUsable(profession_states.m_buffer, profession_states.size());
+        if (profession_states_usable) {
+            const GW::ProfessionState* found = nullptr;
+            for (size_t i = 0; i < profession_states.size(); ++i) {
+                if (profession_states[i].agent_id == player->agent_id) {
+                    found = &profession_states[i];
+                    break;
                 }
             }
-            out.raw_flood.professions = MakeRawIdSetFamilyObservation(
-                true,
-                true,
-                std::move(profession_ids));
+            if (found) {
+                std::vector<uint32_t> profession_ids;
+                for (uint32_t prof = 1; prof <= 10; ++prof) {
+                    if ((found->unlocked_professions >> prof & 1u) != 0) {
+                        profession_ids.push_back(prof);
+                    }
+                }
+                out.raw_flood.professions = AssembleRawIdSetListObservation(
+                    true,
+                    true,
+                    std::move(profession_ids));
+            }
         }
     }
 
