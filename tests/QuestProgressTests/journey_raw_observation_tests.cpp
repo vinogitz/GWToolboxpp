@@ -265,36 +265,54 @@ void TestNonFloodEventsStillIngest()
 void TestCartographyUsabilityHelper()
 {
     const uint32_t bits[1] = {0xFFu};
-    Expect(IsCartographyBufferUsable(bits, 1, 8, 1), "carto_usable_ok");
-    Expect(!IsCartographyBufferUsable(nullptr, 1, 8, 1), "carto_usable_null");
-    Expect(!IsCartographyBufferUsable(bits, 0, 8, 1), "carto_usable_empty");
-    Expect(!IsCartographyBufferUsable(bits, 1, 0, 1), "carto_usable_width");
-    Expect(!IsCartographyBufferUsable(bits, 1, 8, 0), "carto_usable_height");
+    Expect(IsCartographyBufferUsable(bits, 1, 1, 8, 1), "carto_usable_ok");
+    Expect(!IsCartographyBufferUsable(nullptr, 1, 1, 8, 1), "carto_usable_null");
+    Expect(!IsCartographyBufferUsable(bits, 0, 1, 8, 1), "carto_usable_empty");
+    Expect(!IsCartographyBufferUsable(bits, 1, 1, 0, 1), "carto_usable_width");
+    Expect(!IsCartographyBufferUsable(bits, 1, 1, 8, 0), "carto_usable_height");
 }
 
 void TestStructuralBitsetAndListUsability()
 {
-    Expect(!IsBitsetStorageUsable(nullptr, 4), "bitset_null_unusable");
-    Expect(!IsBitsetStorageUsable(nullptr, 0), "bitset_null_zero_unusable");
+    Expect(!IsBitsetStorageUsable(nullptr, 4, 4), "bitset_null_unusable");
+    Expect(!IsBitsetStorageUsable(nullptr, 0, 0), "bitset_null_zero_unusable");
     const uint32_t empty_words[1] = {0};
-    Expect(!IsBitsetStorageUsable(empty_words, 0), "bitset_zero_length_unusable");
-    Expect(IsBitsetStorageUsable(empty_words, 1), "bitset_zero_content_storage_usable");
+    Expect(!IsBitsetStorageUsable(empty_words, 0, 1), "bitset_zero_length_unusable");
+    Expect(IsBitsetStorageUsable(empty_words, 1, 1), "bitset_zero_content_storage_usable");
 
-    const auto null_bitset = AssembleRawIdSetBitsetObservation(true, nullptr, 4);
+    const auto null_bitset = AssembleRawIdSetBitsetObservation(true, nullptr, 4, 4);
     Expect(null_bitset.context_available, "bitset_null_ctx");
     Expect(!null_bitset.sample_usable, "bitset_null_usable");
     Expect(null_bitset.value.empty(), "bitset_null_payload");
 
-    const auto zero_len = AssembleRawIdSetBitsetObservation(true, empty_words, 0);
+    const auto zero_len = AssembleRawIdSetBitsetObservation(true, empty_words, 0, 1);
     Expect(zero_len.context_available, "bitset_zero_ctx");
     Expect(!zero_len.sample_usable, "bitset_zero_usable");
     Expect(zero_len.value.empty(), "bitset_zero_payload");
 
     const uint32_t words[2] = {0x2u, 0x1u};
-    const auto readable = AssembleRawIdSetBitsetObservation(true, words, 2);
+    const auto readable = AssembleRawIdSetBitsetObservation(true, words, 2, 2);
     Expect(readable.context_available && readable.sample_usable, "bitset_readable_usable");
     Expect(readable.value.size() == 2, "bitset_readable_count");
     Expect(readable.value[0] == 1 && readable.value[1] == 32, "bitset_readable_sorted_ids");
+
+    Expect(!IsGwcaArrayStructurallyValid(words, 4, 2), "array_size_gt_capacity_invalid");
+    Expect(!IsBitsetStorageUsable(words, 4, 2), "bitset_size_gt_capacity_unusable");
+    const auto oversize = AssembleRawIdSetBitsetObservation(true, words, 4, 2);
+    Expect(oversize.context_available, "bitset_oversize_ctx");
+    Expect(!oversize.sample_usable, "bitset_oversize_usable");
+    Expect(oversize.value.empty(), "bitset_oversize_no_read");
+
+    Expect(!IsCartographyBufferUsable(words, 4, 2, 64, 64), "carto_size_gt_capacity");
+    Expect(ComputeCartographyCoveragePercent(words, 4, 2, 64, 64) == 0, "carto_oversize_no_coverage");
+    Expect(
+        MakeRawPercentFamilyObservation(
+            true,
+            IsCartographyBufferUsable(words, 4, 2, 64, 64),
+            99)
+            .sample_usable
+            == false,
+        "carto_oversize_family_unusable");
 
     Expect(IsListStorageUsable(nullptr, 0), "list_empty_usable");
     Expect(!IsListStorageUsable(nullptr, 3), "list_null_positive_unusable");
@@ -319,9 +337,13 @@ void TestStructuralBitsetAndListUsability()
 
     RawJourneyFloodObservation observation;
     observation.observed_at = "2026-09-12T12:00:00.000Z";
-    observation.maps = AssembleRawIdSetBitsetObservation(true, words, 2);
-    observation.character_skills = AssembleRawIdSetBitsetObservation(true, nullptr, 2);
-    observation.vanquish_areas = AssembleRawIdSetBitsetObservation(true, empty_words, 0);
+    observation.maps = AssembleRawIdSetBitsetObservation(true, words, 2, 2);
+    observation.character_skills = AssembleRawIdSetBitsetObservation(true, nullptr, 2, 2);
+    observation.vanquish_areas = AssembleRawIdSetBitsetObservation(true, empty_words, 0, 1);
+    observation.cartography = MakeRawPercentFamilyObservation(
+        true,
+        IsCartographyBufferUsable(words, 4, 2, 64, 64),
+        50);
     observation.heroes = AssembleRawIdSetListObservation(
         true,
         IsListStorageUsable(list_ids, 3),
@@ -342,6 +364,10 @@ void TestStructuralBitsetAndListUsability()
         observation.vanquish_areas.context_available && !observation.vanquish_areas.sample_usable
             && observation.vanquish_areas.value.empty(),
         "struct_vanquish_only_unusable");
+    Expect(
+        observation.cartography.context_available && !observation.cartography.sample_usable
+            && observation.cartography.value == 0,
+        "struct_carto_oversize_unusable");
     Expect(observation.heroes.sample_usable, "struct_heroes_usable");
     Expect(
         observation.account_skills.context_available && !observation.account_skills.sample_usable
@@ -350,7 +376,7 @@ void TestStructuralBitsetAndListUsability()
     Expect(observation.hard_mode.sample_usable && observation.hard_mode.value, "struct_hm_unaffected");
 
     RawJourneyFloodObservation reverse;
-    reverse.maps = AssembleRawIdSetBitsetObservation(true, nullptr, 1);
+    reverse.maps = AssembleRawIdSetBitsetObservation(true, nullptr, 1, 1);
     reverse.account_skills = AssembleRawIdSetListObservation(
         true,
         IsListStorageUsable(list_ids, 3),

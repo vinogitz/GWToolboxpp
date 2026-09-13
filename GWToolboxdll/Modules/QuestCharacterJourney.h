@@ -232,19 +232,23 @@ RawFactionFamilyObservation MakeRawFactionFamilyObservation(
     bool sample_usable,
     FactionTotalsRecord totals);
 
+bool IsGwcaArrayStructurallyValid(const void* buffer, size_t size, size_t capacity);
+
 bool IsCartographyBufferUsable(
     const uint32_t* bits,
     size_t dword_count,
+    size_t capacity,
     uint32_t width,
     uint32_t height);
 
-bool IsBitsetStorageUsable(const uint32_t* words, size_t word_count);
+bool IsBitsetStorageUsable(const uint32_t* words, size_t word_count, size_t capacity);
 bool IsListStorageUsable(const void* buffer, size_t element_count);
 
 RawIdSetFamilyObservation AssembleRawIdSetBitsetObservation(
     bool context_available,
     const uint32_t* words,
-    size_t word_count);
+    size_t word_count,
+    size_t capacity);
 
 RawIdSetFamilyObservation AssembleRawIdSetListObservation(
     bool context_available,
@@ -254,6 +258,7 @@ RawIdSetFamilyObservation AssembleRawIdSetListObservation(
 uint32_t ComputeCartographyCoveragePercent(
     const uint32_t* bits,
     size_t dword_count,
+    size_t capacity,
     uint32_t width,
     uint32_t height);
 

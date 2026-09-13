@@ -219,12 +219,14 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
     out.raw_flood.maps = AssembleRawIdSetBitsetObservation(
         true,
         world->unlocked_map.m_buffer,
-        world->unlocked_map.m_size);
+        world->unlocked_map.m_size,
+        world->unlocked_map.m_capacity);
 
     out.raw_flood.character_skills = AssembleRawIdSetBitsetObservation(
         true,
         world->unlocked_character_skills.m_buffer,
-        world->unlocked_character_skills.m_size);
+        world->unlocked_character_skills.m_size,
+        world->unlocked_character_skills.m_capacity);
 
     if (const auto* account = game->account) {
         const auto& account_skills = account->unlocked_account_skills;
@@ -272,7 +274,8 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
     out.raw_flood.vanquish_areas = AssembleRawIdSetBitsetObservation(
         true,
         world->vanquished_areas.m_buffer,
-        world->vanquished_areas.m_size);
+        world->vanquished_areas.m_size,
+        world->vanquished_areas.m_capacity);
 
     if (const auto* player = GW::PlayerMgr::GetPlayerByID()) {
         const auto& profession_states = world->party_profession_states;
@@ -301,15 +304,19 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
         }
     }
 
-    const auto* carto_bits = reinterpret_cast<const uint32_t*>(world->cartographed_areas.m_buffer);
-    const auto carto_dword_count = world->cartographed_areas.size();
+    const auto& cartographed = world->cartographed_areas;
+    const auto* carto_bits = reinterpret_cast<const uint32_t*>(cartographed.m_buffer);
+    const auto carto_dword_count = cartographed.size();
+    const auto carto_capacity = cartographed.capacity();
     const auto carto_width = world->h05B4[0];
     const auto carto_height = world->h05B4[1];
-    const auto carto_usable = IsCartographyBufferUsable(
-        carto_bits,
-        carto_dword_count,
-        carto_width,
-        carto_height);
+    const auto carto_usable = cartographed.valid()
+        && IsCartographyBufferUsable(
+            carto_bits,
+            carto_dword_count,
+            carto_capacity,
+            carto_width,
+            carto_height);
     out.raw_flood.cartography = MakeRawPercentFamilyObservation(
         true,
         carto_usable,
@@ -317,6 +324,7 @@ JourneySnapshotResult SampleLiveJourneySnapshot(
             ? ComputeCartographyCoveragePercent(
                 carto_bits,
                 carto_dword_count,
+                carto_capacity,
                 carto_width,
                 carto_height)
             : 0u);

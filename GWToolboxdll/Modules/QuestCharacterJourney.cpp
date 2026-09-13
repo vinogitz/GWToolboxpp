@@ -441,18 +441,31 @@ RawFactionFamilyObservation MakeRawFactionFamilyObservation(
     return family;
 }
 
+bool IsGwcaArrayStructurallyValid(const void* buffer, size_t size, size_t capacity)
+{
+    const auto address = reinterpret_cast<uintptr_t>(buffer);
+    return (buffer == nullptr || (address & 0x3u) == 0u) && size <= capacity;
+}
+
 bool IsCartographyBufferUsable(
     const uint32_t* bits,
     size_t dword_count,
+    size_t capacity,
     uint32_t width,
     uint32_t height)
 {
-    return bits != nullptr && dword_count > 0 && width > 0 && height > 0;
+    return bits != nullptr
+        && dword_count > 0
+        && width > 0
+        && height > 0
+        && IsGwcaArrayStructurallyValid(bits, dword_count, capacity);
 }
 
-bool IsBitsetStorageUsable(const uint32_t* words, size_t word_count)
+bool IsBitsetStorageUsable(const uint32_t* words, size_t word_count, size_t capacity)
 {
-    return words != nullptr && word_count > 0;
+    return words != nullptr
+        && word_count > 0
+        && IsGwcaArrayStructurallyValid(words, word_count, capacity);
 }
 
 bool IsListStorageUsable(const void* buffer, size_t element_count)
@@ -463,12 +476,13 @@ bool IsListStorageUsable(const void* buffer, size_t element_count)
 RawIdSetFamilyObservation AssembleRawIdSetBitsetObservation(
     bool context_available,
     const uint32_t* words,
-    size_t word_count)
+    size_t word_count,
+    size_t capacity)
 {
     if (!context_available) {
         return MakeRawIdSetFamilyObservation(false, false, {});
     }
-    if (!IsBitsetStorageUsable(words, word_count)) {
+    if (!IsBitsetStorageUsable(words, word_count, capacity)) {
         return MakeRawIdSetFamilyObservation(true, false, {});
     }
     std::vector<uint32_t> ids;
@@ -501,10 +515,11 @@ RawIdSetFamilyObservation AssembleRawIdSetListObservation(
 uint32_t ComputeCartographyCoveragePercent(
     const uint32_t* bits,
     size_t dword_count,
+    size_t capacity,
     uint32_t width,
     uint32_t height)
 {
-    if (!IsCartographyBufferUsable(bits, dword_count, width, height)) {
+    if (!IsCartographyBufferUsable(bits, dword_count, capacity, width, height)) {
         return 0;
     }
     const uint64_t total_bits = static_cast<uint64_t>(width) * static_cast<uint64_t>(height);
