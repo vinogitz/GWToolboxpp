@@ -310,6 +310,59 @@ void TestHardModeLegacyTruePreserved()
     Expect(later.baseline.unlocked, "hm_legacy_stays_true");
 }
 
+void TestZeroIdNeverSealsOrFalseDelta()
+{
+    IdSetJourneyBaseline baseline{};
+    IdSetBaselineCandidate candidate{};
+    IdSetBaselineTransitionResult step{};
+    for (int i = 0; i < 3; ++i) {
+        step = StepMaps(UsableIds({0}), baseline, candidate, {}, kTs);
+        baseline = step.baseline;
+        candidate = step.candidate;
+        Expect(step.new_events.empty(), "zero_id_no_events");
+    }
+    Expect(step.baseline.state == JourneyBaselineSealState::Unset, "zero_id_no_seal");
+    Expect(step.baseline.ids.empty(), "zero_id_baseline_empty");
+
+    const uint32_t bit0_words[1] = {0x1u};
+    const auto bit0_obs = AssembleRawIdSetBitsetObservation(true, bit0_words, 1, 1);
+    Expect(bit0_obs.sample_usable, "zero_bitset_usable");
+    Expect(bit0_obs.value.size() == 1 && bit0_obs.value[0] == 0, "zero_bitset_id0");
+    for (int i = 0; i < 3; ++i) {
+        step = StepMaps(bit0_obs, baseline, candidate, {}, kTs);
+        baseline = step.baseline;
+        candidate = step.candidate;
+    }
+    Expect(step.baseline.state == JourneyBaselineSealState::Unset, "zero_bitset_no_seal");
+
+    step = SealMapsAfterThree({42});
+    Expect(step.baseline.state == JourneyBaselineSealState::Sealed, "real_id_after_zero_seals");
+    Expect(step.baseline.ids.size() == 1 && step.baseline.ids[0] == 42, "real_id_baseline");
+    Expect(step.new_events.empty(), "real_id_bootstrap_zero_events");
+
+    auto delta = StepMaps(UsableIds({42}), step.baseline, step.candidate, {}, kTs4);
+    Expect(delta.new_events.empty(), "real_id_no_false_delta");
+}
+
+void TestSealedPartialSampleNoEmitNoExpand()
+{
+    auto sealed = SealMapsAfterThree({10, 20});
+    Expect(sealed.baseline.state == JourneyBaselineSealState::Sealed, "partial_pre_sealed");
+    Expect(sealed.baseline.ids.size() == 2, "partial_pre_ids");
+
+    auto partial = StepMaps(UsableIds({10, 30}), sealed.baseline, sealed.candidate, {}, kTs4);
+    Expect(partial.new_events.empty(), "partial_no_events");
+    Expect(partial.baseline.ids.size() == 2, "partial_baseline_unchanged_size");
+    Expect(partial.baseline.ids[0] == 10 && partial.baseline.ids[1] == 20, "partial_baseline_unchanged_ids");
+
+    auto full = StepMaps(UsableIds({10, 20, 30}), partial.baseline, partial.candidate, {}, kTs4);
+    Expect(full.new_events.size() == 1, "full_one_event");
+    Expect(full.new_events[0].kind == "map_unlock", "full_kind");
+    Expect(full.new_events[0].map_id == 30, "full_id_30");
+    Expect(full.baseline.ids.size() == 3, "full_baseline_grew");
+    Expect(full.baseline.ids[2] == 30, "full_baseline_has_30");
+}
+
 } // namespace
 
 void RunJourneyBaselineTransitionTests()
@@ -323,4 +376,6 @@ void RunJourneyBaselineTransitionTests()
     TestInputsUnchangedAndOtherFieldsUntouched();
     TestHardModeFalseSealThenTrueOnce();
     TestHardModeLegacyTruePreserved();
+    TestZeroIdNeverSealsOrFalseDelta();
+    TestSealedPartialSampleNoEmitNoExpand();
 }

@@ -35,6 +35,12 @@ void UnionSortedUniqueInto(std::vector<uint32_t>& into, const std::vector<uint32
     CanonicalizeSortedUniqueIds(into);
 }
 
+void StripZeroIds(std::vector<uint32_t>& ids)
+{
+    ids.erase(std::remove(ids.begin(), ids.end(), 0u), ids.end());
+    CanonicalizeSortedUniqueIds(ids);
+}
+
 std::map<uint32_t, bool> PriorMapFromIds(const std::vector<uint32_t>& ids)
 {
     std::map<uint32_t, bool> out;
@@ -98,6 +104,7 @@ IdSetBaselineTransitionResult TransitionIdSetUnset(
 
     auto current = observation.value;
     CanonicalizeSortedUniqueIds(current);
+    StripZeroIds(current);
 
     if (current.empty()) {
         BreakIdSetStreak(out.candidate);
@@ -159,6 +166,12 @@ IdSetBaselineTransitionResult TransitionIdSetSealed(
 
     auto current = observation.value;
     CanonicalizeSortedUniqueIds(current);
+    StripZeroIds(current);
+
+    if (!IsSortedUniqueSubset(out.baseline.ids, current)) {
+        return out;
+    }
+
     auto prior = PriorMapFromIds(out.baseline.ids);
     out.new_events = BuildNewlySeenIdEvents(
         kind,
