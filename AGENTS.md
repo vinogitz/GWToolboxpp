@@ -14,3 +14,11 @@ Instructions for any AI agent in this repo. (`CLAUDE.md` just imports this.)
 - **Docs (`site/`):** pages go in `src/content/docs/`; `llms.txt`/`llms-full.txt` auto-generate from them. A new page needs `description:` frontmatter plus a `src/lib/nav.ts` entry to appear in `llms.txt`. After changes run `npm --prefix site run build` and check `site/dist/llms.txt`.
 - **Docs structure:** before adding documentation, inspect the existing overview and relevant feature/group pages. Extend an existing section when it fits. Follow neighboring pages' Markdown/MDX structure, `ToolboxPath` components, headings, and level of detail. Add search terminology naturally to the relevant content; a search-discoverability request alone does not warrant a new page or navigation entry.
 - **Explaining a feature:** first check if it's documented (`src/content/docs/` or <https://www.gwtoolbox.com/docs/>); if missing/wrong, flag it, offer a fix, and link the page.
+
+## AI collaboration and review
+
+- For a Cursor → ChatGPT senior-review loop, read `docs/ai/REVIEW_GOVERNANCE.md`.
+- Cursor implements only an approved slice, runs relevant checks, and prepares the required compact handoff.
+- ChatGPT review is read-only. It must not edit, commit, push, alter CI/policy, change PR lifecycle, or merge unless the human explicitly asks.
+- After a prior review, use a delta handoff and delta review rather than repeating a full audit. One full acceptance review occurs immediately before the human PR decision.
+- Existing issue- and PR-specific instructions are stricter and win, including Quest Tracker observation semantics, identity binding, persistence, and inter-repository progress-contract constraints.
