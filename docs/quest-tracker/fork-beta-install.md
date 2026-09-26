@@ -24,8 +24,10 @@ GWToolbox.exe /localdll /noupdate /noinstall
 Or, with Guild Wars already running:
 
 ```text
-GWToolbox.exe /pid <GwPid> /localdll /noupdate /noinstall /noexecheck
+GWToolbox.exe /pid <GwPid> /localdll /noupdate /noinstall
 ```
+
+Do not use `/noexecheck` as a default launch flag.
 
 `/localdll` loads the DLL beside the launcher and implies `/noupdate` / `/noinstall` for the **launcher**. See also `site` launch-options docs if present in your tree.
 
@@ -54,13 +56,16 @@ Do not publish raw exports, character names, or character keys.
 
 ## Return to official Toolbox
 
-1. Quit Guild Wars / unload Toolbox.
-2. Remove or rename the fork `GWToolboxdll.dll` next to your launcher (keep a backup if you want to return).
-3. Run the normal official installer / launcher from [gwtoolbox.com](https://gwtoolbox.com), **without** `/localdll`, so the installed official DLL is used again.
-4. Optionally clear or leave fork settings under `Documents/GWToolboxpp\` — progress JSON is observational data, not required for official Toolbox to run.
+1. Quit Guild Wars / unload Toolbox completely.
+2. Install or reinstall a **clean official Toolbox** from [gwtoolbox.com](https://gwtoolbox.com) into its normal install location (do not treat “rename the fork DLL and keep launching from the same RelWithDebInfo folder” as a verified return path).
+3. Start Guild Wars, then launch the **official** installer/launcher **without** `/localdll`, so it injects the official installed DLL.
+4. Optionally keep or delete fork settings under `Documents/GWToolboxpp\` — progress JSON is observational data and is not required for official Toolbox to run.
 
 ## Where to report problems
 
-- Fork Quest Tracker / Contract export issues: this fork’s GitHub issues (`vinogitz/GWToolboxpp`), with **redacted** diagnostics (no full export dumps).
-- Tyrian Wayfarer import / dossier: the Wayfarer / Codex consumer repository.
-- Official Toolbox bugs unrelated to the fork: upstream channels only — do not expect upstream to support this fork build.
+Open issues on **`vinogitz/GWToolboxpp`** (the Wayfarer consumer repo is private for now).
+
+- Quest Tracker / Contract **export**: title prefix or label `quest-tracker` / `contract-export`; describe steps and redacted diagnostics only.
+- Wayfarer **import / dossier / Life journey**: title prefix or label `wayfarer-import` (or `wayfarer-dossier`); say which Wayfarer build/platform you used, without private repo access assumptions.
+- Do **not** attach raw Contract JSON exports, character names, or character keys. Prefer counts, `producer.version`, outcome text (e.g. already imported / insert counts), and redacted error messages.
+- Official Toolbox bugs unrelated to this fork: upstream channels only — do not expect upstream to support this fork build.
