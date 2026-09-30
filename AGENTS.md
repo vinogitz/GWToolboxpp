@@ -15,6 +15,11 @@ Instructions for any AI agent in this repo. (`CLAUDE.md` just imports this.)
 - **Docs structure:** before adding documentation, inspect the existing overview and relevant feature/group pages. Extend an existing section when it fits. Follow neighboring pages' Markdown/MDX structure, `ToolboxPath` components, headings, and level of detail. Add search terminology naturally to the relevant content; a search-discoverability request alone does not warrant a new page or navigation entry.
 - **Explaining a feature:** first check if it's documented (`src/content/docs/` or <https://www.gwtoolbox.com/docs/>); if missing/wrong, flag it, offer a fix, and link the page.
 
+## Fork vs upstream (absolute)
+
+- Write only to `vinogitz/GWToolboxpp`. Never PR, push, commit, or otherwise contribute to `gwdevhub/GWToolboxpp`.
+- Keep the fork on latest `upstream/master` (gwdevhub HEAD) via `scripts/sync-upstream-rebase.ps1`. Details: `.cursor/rules/upstream-safety.mdc`.
+
 ## AI software factory routing
 
 - Read `docs/ai/AI_SOFTWARE_FACTORY.md` for roles, authority, task sizing, workflow and escalation.
