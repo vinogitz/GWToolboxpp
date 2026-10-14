@@ -40,3 +40,7 @@ Instructions for any AI agent in this repo. (`CLAUDE.md` just imports this.)
 - Read `docs/ai/WORKSPACE_WORKFLOW.md` before repository/branch changes and task handoff. Report the absolute folder, branch/HEAD, upstream, ahead/behind, working tree and current task stage.
 - Follow `docs/ai/HUMAN_LANGUAGE_POLICY.md`: human-facing prose is Hungarian; PR bodies contain full Hungarian then full English versions. Preserve technical identifiers.
 - Use `docs/ai/GOVERNANCE_READINESS.md` for the outstanding operational and beta evidence checkpoint; it is not a runtime acceptance verdict.
+
+## Checkout policy
+
+- Use only the original repository checkout (`D:/Development/C++/GWToolboxpp` on `master`). Do not create additional Git worktrees for this repo.

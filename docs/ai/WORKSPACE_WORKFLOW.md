@@ -24,7 +24,7 @@ Use read-only Git probes first: git status --short --branch, git rev-parse HEAD,
 - GWToolboxpp fork work targets vinogitz/GWToolboxpp master unless the task explicitly says otherwise. Never retarget it to gwdevhub/GWToolboxpp.
 - Wayfarer work targets vinogitz/guildwarscodex main unless the task explicitly says otherwise.
 - Do not silently switch branches, stash, reset, clean files, delete branches or worktrees, rebase, or force-push to repair unexpected state. Describe the observed state and preserve user work. Resolve routine safe choices within existing authorization; ask only for a material missing decision.
-- When a clean task branch is authorized, creating it from the verified base is routine. When isolating work, prefer a named worktree over moving unrelated changes between branches, if the local repository supports it.
+- When a clean task branch is authorized, creating it from the verified base is routine. Work only in the original repository checkout folder for each repo (`guildwarscodex` → `main`, `GWToolboxpp` → `master`). Do not create additional Git worktrees. Isolate approved slices with branches inside that single checkout.
 - After a merge, report the merge SHA and local/remote status. Advance the local base using --ff-only only when authorized and clean. Inventory obsolete branches; deletion requires explicit scope and proof that they contain no unique work.
 
 ## Task stages and evidence
