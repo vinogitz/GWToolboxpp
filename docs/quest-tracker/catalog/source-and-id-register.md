@@ -1,13 +1,13 @@
 # Forrás- és ID-ellenőrzési jegyzék — Pre-Searing pilot
 
-TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · katalógus `0.1.0-pilot` · lekérés: 2026-11-26 · `DATA_CAPTURE_READY=NOT_READY`
+TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · katalógus `0.2.0-pilot` · wiki-lekérés: 2026-11-26 · első játékbeli rögzítés: 2026-11-27 · `DATA_CAPTURE_READY=NOT_READY`
 
 ## Szabály
 
 - A wiki oldalazonosító (`pageId`) és a névegyezés önmagában nem igazol játékbeli ID-t. A `pageId` csak a forrásverzió rögzítésére szolgál.
 - A `Game link:Quest N` oldalak a játék beépített súgólinkjeinek céljai, amelyeket wiki-szerkesztők irányítanak át. Ha valaki kézzel keresi meg őket, wiki ID-forrásnak számítanak, nem játékbeli rögzítésnek. Csak a játékból indított, átirányítás előtti link számít játékbeli megfigyelésnek (lásd lent).
 - A helyi Toolbox exportokban a `questName` és a célszöveg üres, így azok csak azt mutatják, hogy egy ID milyen kontextusban (Pre-Searing, profession) jelent meg. Nevet nem kötnek ID-hoz.
-- `verified_in_game` státuszhoz a lenti szabály szerinti játékbeli megfigyelés kell. A pilotban ilyen még nincs.
+- `verified_in_game` státuszhoz a lenti szabály szerinti játékbeli megfigyelés kell. A pilotban egy ilyen megfigyelés van: Getting Started in Guild Wars (`1462`), lásd a rögzítési jegyzőkönyvet lent.
 
 ## Számozási tér keresztellenőrzése
 
@@ -24,13 +24,13 @@ TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · katalógus `0.1.0-pilot` · leké
 - Nem elég: kézzel megkeresett wiki-link vagy `Game link:Quest N` oldal, névegyezés, wiki oldalazonosító, név nélküli export (a mostani helyi exportok ilyenek), upstream kódmegjegyzés vagy GWCA konstans.
 - `corroborated` és `source_claimed` marad jelölt (`candidate`). Automatikus kapcsolás (`linked`) kizárólag `verified_in_game` esetén van.
 - A validátor kényszeríti: a bizonyíték `observedName`-je egyezzen a bejegyzés nevével, a `campaignContext` a kampánnyal, a `professionContext` ne legyen `unknown`, és `in_game_game_link` esetén `preRedirect` legyen igaz.
-- A pilotban ilyen megfigyelés nincs, ezért egyetlen bejegyzés sem `verified_in_game`, és új játékbeli adatgyűjtés ebben a körben nem történt.
+- A validátor nem tárolja strukturáltan, honnan származik az átirányítás előtti cím (címsor, `rdfrom` vagy „Redirected from” sor): ezt a forrás `url` mezője és a bizonyíték `note` mezője rögzíti. A `preRedirect: true` azt jelenti, hogy a `Game link:Quest N` érték az átirányítás előtti cím, akkor is, ha azt az `rdfrom` paraméterből olvastuk ki.
 
 ## Bejegyzések
 
 | key | név | `gameQuestId` | státusz | ID-bizonyíték | megjegyzés |
 | --- | --- | --- | --- | --- | --- |
-| `presearing.getting_started_in_guild_wars` | Getting Started in Guild Wars | 1462 | `corroborated` | `wiki_infobox_id`=1462 (gww-getting-started-in-guild-wars); `wiki_game_link`=1462 (gww-game-link-quest-1462); `wiki_game_integration_table`=1462 (gww-game-integration-quests-1000-1499); `toolbox_live_observation`=1462 (toolbox-live-exports-2026-11) | No in-game name/text capture binds 1462 to this quest yet, so it is not auto-linkable. |
+| `presearing.getting_started_in_guild_wars` | Getting Started in Guild Wars | 1462 | `verified_in_game` | `in_game_game_link`=1462 (in-game-f10-help-quest-1462-2026-11-27); `wiki_infobox_id`=1462 (gww-getting-started-in-guild-wars); `wiki_game_link`=1462 (gww-game-link-quest-1462); `wiki_game_integration_table`=1462 (gww-game-integration-quests-1000-1499); `toolbox_live_observation`=1462 (toolbox-live-exports-2026-11) | 2026-11-27 F10 Help panel, Toolbox nélkül, Pre-Searing Monk. A böngésző 403-at adott; az átirányítás előtti cím az `rdfrom` paraméterből: `Game_link:Quest_1462`. Automatikusan kapcsolható. |
 | `presearing.war_preparations` | War Preparations | null (jelöltek: 35, 217, 218, 219, 220, 221, 222) | `ambiguous` | `wiki_infobox_id`=219 (gww-war-preparations); `wiki_game_link`=35 (gww-game-link-quest-35); `wiki_game_link`=220 (gww-game-link-quest-220); `wiki_game_integration_table`=35 (gww-game-integration-quests-0-499); `toolbox_live_observation`=220 (toolbox-live-exports-2026-11) | Name match cannot select an id: seven ids redirect to the same article and the disambiguation page describes six Pre-Searing variants. Never auto-linked. |
 | `presearing.warrior_test` | Warrior Test | 85 | `source_claimed` | `wiki_infobox_id`=85 (gww-warrior-test); `wiki_game_link`=85 (gww-game-link-quest-85); `wiki_game_integration_table`=85 (gww-game-integration-quests-0-499) | Wiki sources only; not observed in local exports. |
 | `presearing.ranger_test` | Ranger Test | 86 | `source_claimed` | `wiki_infobox_id`=86 (gww-ranger-test); `wiki_game_link`=86 (gww-game-link-quest-86); `wiki_game_integration_table`=86 (gww-game-integration-quests-0-499) | Wiki sources only; not observed in local exports. |
@@ -97,5 +97,18 @@ További Pre-Searing ID-k is megjelentek, ezek a pilot hatókörén kívül esne
 | `repo-hintsmodule-quest-56` | `repo_code` | HintsModule OnQuestAdded_UIMessage: case 56 // Adventure with an ally | bbe0576c0 | GWToolboxdll/Modules/HintsModule.cpp |
 | `repo-gwca-questids` | `repo_code` | GWCA Constants QuestID enum | blob 348074fcb3942e44311249bcd0dd0dbfd8719269 | Dependencies/GWCA/include/GWCA/Constants/QuestIDs.h |
 | `toolbox-live-exports-2026-11` | `toolbox_live_export` | Local Quest Progress Contract v1 exports of this fork (SZABOBE16IRX9 profile, 2026-10-17..2026-11-25) | — | helyi, nem a repóban |
+| `in-game-f10-help-quest-1462-2026-11-27` | `wiki_game_link` | F10 Help panel Game link capture for Quest 1462 (Bence, 2026-11-27) | — (élő kliens, nem wiki-revízió) | https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_1462%26redirect%3Dno |
 
 A wiki revíziók a `https://wiki.guildwars.com/index.php?oldid=<revisionId>` címen érhetők el. A katalógus leírásai saját megfogalmazású, tényszerű összefoglalók; a forrást az URL és a revízió azonosítja.
+
+
+## Játékbeli rögzítés — Getting Started in Guild Wars (1462)
+
+- Dátum: 2026-11-27, kb. 02:55 (Europe/Budapest, UTC+1). Rögzítette: Bence. Képernyőkép nem készült; az URL szövegként érkezett.
+- Kontextus: Pre-Searing, elsődleges szakma Monk. A küldetés bent volt a naplóban. A naplóban látható név: Getting Started in Guild Wars. A katalógus `campaign` mezője `prophecies`, a Pre-Searing a `region` (`ascalon_pre_searing`); a bizonyíték `campaignContext` értéke ezért `prophecies`, a Pre-Searing a megjegyzésben szerepel.
+- Módszer: a vanilla kliens Help panelje (F10), Toolbox nélkül. A Community Wiki / Quests listában a küldetés linkjére kattintott.
+- A böngészőben megnyílt URL (a lap HTTP 403 Forbidden választ adott):
+  `https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_1462%26redirect%3Dno`
+- Az átirányítás előtti cím az `rdfrom` paraméterből: `Game_link:Quest_1462`. A „Redirected from” sor nem jelent meg: a wiki `ingame-help` előtagja elnyomja, és az `rdfrom`-os céloldal 403-at ad.
+- Ez a 403 várható, nem azt jelenti, hogy a Help rossz cikkre visz. A kliens a `Game_link:Quest_1462` címet nyitja; a wiki 302-vel az `rdfrom` lekérdezést fűzi a cikkre, és a wiki terheléselosztója ezt a lekérdezést 403-mal utasítja el. A cikk `https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars` `rdfrom` nélkül elérhető. A Toolbox ugyanezt a 403-at kerülve a feloldott cikket nyitja, ezért a pre-redirect érték rögzítéséhez Toolbox nélkül kellett a Help panelt használni.
+- Státusz: `verified_in_game`. A 1462 ettől automatikusan kapcsolható (`linked`). Ebből nem következik más küldetés lezárása.

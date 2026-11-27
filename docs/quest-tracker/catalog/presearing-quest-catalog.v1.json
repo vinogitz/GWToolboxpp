@@ -1,7 +1,7 @@
 {
   "catalog": "gwtoolbox-quest-catalog",
   "schemaVersion": 1,
-  "catalogVersion": "0.1.0-pilot",
+  "catalogVersion": "0.2.0-pilot",
   "scope": {
     "campaign": "prophecies",
     "region": "ascalon_pre_searing",
@@ -335,6 +335,14 @@
       "title": "Local Quest Progress Contract v1 exports of this fork (SZABOBE16IRX9 profile, 2026-10-17..2026-11-25)",
       "retrievedAt": "2026-11-26",
       "note": "Read-only, not copied into the repo. gameQuestId + state + objective count only; questName and objective text are empty in these files. Character profession taken from primaryProfession (3 = monk, 5 = mesmer)."
+    },
+    {
+      "id": "in-game-f10-help-quest-1462-2026-11-27",
+      "kind": "wiki_game_link",
+      "title": "F10 Help panel Game link capture for Quest 1462 (Bence, 2026-11-27)",
+      "url": "https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_1462%26redirect%3Dno",
+      "retrievedAt": "2026-11-27",
+      "note": "Opened from the vanilla Guild Wars Help panel (F10) with Toolbox not loaded, on a Pre-Searing primary Monk, with the quest in the log. The browser landed on this URL and the page returned HTTP 403. The pre-redirect title Game_link:Quest_1462 is taken from the rdfrom query parameter. Captured by Bence as URL text; no screenshot. Time: about 02:55 Europe/Budapest."
     }
   ],
   "quests": [
@@ -349,7 +357,7 @@
       "gameQuestId": 1462,
       "candidateGameQuestIds": [],
       "idVerification": {
-        "status": "corroborated",
+        "status": "verified_in_game",
         "evidence": [
           {
             "kind": "wiki_infobox_id",
@@ -371,15 +379,26 @@
             "sourceId": "toolbox-live-exports-2026-11",
             "value": 1462,
             "note": "Present on 5 of 5 isPreSearing=true characters, absent on the post-Searing one; one monk character shows objectives 1 -> 2 with objective 0 completed under the same id after Monk Test reward evidence."
+          },
+          {
+            "kind": "in_game_game_link",
+            "sourceId": "in-game-f10-help-quest-1462-2026-11-27",
+            "value": 1462,
+            "observedName": "Getting Started in Guild Wars",
+            "campaignContext": "prophecies",
+            "professionContext": "monk",
+            "preRedirect": true,
+            "note": "Quest log name observed as Getting Started in Guild Wars. Region context: Pre-Searing (ascalon_pre_searing); campaignContext is prophecies because that is the catalog campaign field. Primary profession Monk. Method: F10 Help panel, Toolbox not loaded. The opened page returned HTTP 403. The pre-redirect title Game_link:Quest_1462 was taken from the rdfrom parameter of the captured URL, not from a Redirected from page header (that header is suppressed by the wiki ingame-help prefix, and the rdfrom landing page is 403). Captured by Bence on 2026-11-27 at about 02:55 Europe/Budapest, as URL text, no screenshot."
           }
         ],
-        "note": "No in-game name/text capture binds 1462 to this quest yet, so it is not auto-linkable."
+        "note": "In-game F10 Help panel capture on 2026-11-27 binds the quest-log name to Game_link:Quest_1462 (rdfrom parameter of a 403 URL). Auto-linkable."
       },
       "sourceIds": [
         "gww-getting-started-in-guild-wars",
         "gww-game-link-quest-1462",
         "gww-game-integration-quests-1000-1499",
-        "toolbox-live-exports-2026-11"
+        "toolbox-live-exports-2026-11",
+        "in-game-f10-help-quest-1462-2026-11-27"
       ],
       "objectives": {
         "model": "sequential_same_id",

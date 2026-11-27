@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import unittest
+import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -58,7 +59,7 @@ class CatalogValidity(unittest.TestCase):
         self.assertEqual(catalog["dataCaptureReady"], "NOT_READY")
         self.assertFalse(catalog["scope"]["synthetic"])
         self.assertEqual(catalog["linkPolicy"]["autoLinkStatuses"], ["verified_in_game"])
-        self.assertFalse([q["key"] for q in catalog["quests"] if q["idVerification"]["status"] == "verified_in_game"])
+        self.assertEqual([q["key"] for q in catalog["quests"] if q["idVerification"]["status"] == "verified_in_game"], ["presearing.getting_started_in_guild_wars"])
 
     def test_war_preparations_unchanged_ambiguous(self):
         catalog = real_catalog()
@@ -103,7 +104,20 @@ class CatalogValidity(unittest.TestCase):
         self.assertEqual(entry["objectives"]["model"], "sequential_same_id")
         self.assertGreaterEqual(len(entry["objectives"]["stages"]), 2)
         self.assertEqual(entry["region"], "ascalon_pre_searing")
-        self.assertNotEqual(entry["idVerification"]["status"], "verified_in_game")
+        self.assertEqual(entry["idVerification"]["status"], "verified_in_game")
+        evidence = next(e for e in entry["idVerification"]["evidence"] if e["kind"] == "in_game_game_link")
+        self.assertEqual(evidence["value"], 1462)
+        self.assertEqual(evidence["observedName"], "Getting Started in Guild Wars")
+        self.assertEqual(evidence["campaignContext"], "prophecies")
+        self.assertEqual(evidence["professionContext"], "monk")
+        self.assertIs(evidence["preRedirect"], True)
+        source = next(s for s in real_catalog()["sources"] if s["id"] == evidence["sourceId"])
+        self.assertIn("rdfrom=", source["url"])
+        self.assertIn("Game_link:Quest_1462", urllib.parse.unquote(source["url"]))
+        self.assertIn("403", evidence["note"])
+        self.assertIn("rdfrom", evidence["note"])
+        self.assertIn("F10 Help panel", evidence["note"])
+        self.assertIn("Toolbox not loaded", evidence["note"])
 
     def test_case_separate_id_chain(self):
         catalog = real_catalog()
@@ -301,10 +315,12 @@ class Linking(unittest.TestCase):
         self.assertEqual(row(found["synthetic-char-4"], 900102)["linkState"], "linked")
         self.assertIn("synthetic-char-3", found)
 
-    def test_real_catalog_never_autolinks_unverified(self):
+    def test_real_catalog_autolinks_only_verified_getting_started(self):
         report = self.link(real_catalog(), "export-presearing-derived.contract-v1.json")
-        self.assertNotIn("linked", report["counts"])
+        self.assertEqual(report["counts"], {"ambiguous_candidate": 1, "candidate": 6, "linked": 4})
         found = characters(report)
+        for key in ("derived-monk-a", "derived-monk-b", "derived-mesmer-c", "hypothetical-monk-d"):
+            self.assertEqual(row(found[key], 1462)["linkState"], "linked")
         self.assertEqual(row(found["derived-monk-b"], 220)["linkState"], "ambiguous_candidate")
         self.assertEqual(row(found["derived-monk-a"], 84)["linkState"], "candidate")
         self.assertTrue(all(not c["prerequisites"] for c in found.values()))
@@ -323,7 +339,7 @@ class Linking(unittest.TestCase):
         self.assertEqual(evidenced["evidence"][0]["confidence"], "probable")
         hypothetical = found["hypothetical-monk-d"]["prerequisites"][0]
         self.assertEqual((hypothetical["closure"], hypothetical["reason"]), ("uncertain", "prerequisite_absent_from_export"))
-        self.assertEqual(row(found["hypothetical-monk-d"], 1462)["linkState"], "candidate")
+        self.assertEqual(row(found["hypothetical-monk-d"], 1462)["linkState"], "linked")
 
 
 class CommandLine(unittest.TestCase):

@@ -1,12 +1,12 @@
 # Pre-Searing küldetéskatalógus (pilot) — adatleírás
 
-TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · `catalogVersion` `0.1.0-pilot` · `schemaVersion` `1` · `DATA_CAPTURE_READY=NOT_READY`
+TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · `catalogVersion` `0.2.0-pilot` · `schemaVersion` `1` · `DATA_CAPTURE_READY=NOT_READY`
 
 Verziózott, offline használható, géppel olvasható katalógus. Hálózat és build nélkül, Python 3 standard könyvtárral validálható és köthető Contract v1 exporthoz. A producer, a Contract v1 és a Wayfarer változatlan: a katalógus külön adatréteg, nem Contract mező, és nem kerül az exportba.
 
 | Fájl | Szerep |
 | --- | --- |
-| `presearing-quest-catalog.v1.json` | A katalógus (10 bejegyzés, 29 forrás) |
+| `presearing-quest-catalog.v1.json` | A katalógus (10 bejegyzés, 30 forrás) |
 | `quest-catalog.schema.v1.json` | JSON Schema (draft 2020-12), ezt a validátor is betölti |
 | `source-and-id-register.md` | Forrás- és ID-ellenőrzési jegyzék |
 | `../../../scripts/quest_catalog.py` | `validate` és `link` parancs |
@@ -48,7 +48,7 @@ Verziózott, offline használható, géppel olvasható katalógus. Hálózat és
 
 A `verified_in_game` bizonyíték kötelező mezői: `observedName` (egyezik a bejegyzés `name` mezőjével), `campaignContext` (egyezik a `campaign` mezővel), `professionContext` (nem `unknown`), és `in_game_game_link` esetén `preRedirect: true`. Részletes szabály: [source-and-id-register.md](source-and-id-register.md).
 
-A `wiki_page_id` és a `name_match` bizonyíték rögzíthető, de egyik státuszt sem támasztja alá. A `linkPolicy.autoLinkStatuses` nem tartalmazhat ellenőrizetlen státuszt, ezt a validátor hibának veszi. A pilotban **egyik bejegyzés sem `verified_in_game`**, ezért valós exporthoz semmi nem kötődik automatikusan.
+A `wiki_page_id` és a `name_match` bizonyíték rögzíthető, de egyik státuszt sem támasztja alá. A `linkPolicy.autoLinkStatuses` nem tartalmazhat ellenőrizetlen státuszt, ezt a validátor hibának veszi. A pilotban egy bejegyzés `verified_in_game`: `presearing.getting_started_in_guild_wars` (`1462`), 2026-11-27-i F10 Help panel rögzítés alapján (Toolbox nélkül; az átirányítás előtti `Game_link:Quest_1462` cím az `rdfrom` paraméterből, a lap 403-at adott). A többi bejegyzés nem automatikus kapcsolású.
 
 ## Idézetek
 
