@@ -105,7 +105,10 @@ class CatalogValidity(unittest.TestCase):
         self.assertGreaterEqual(len(entry["objectives"]["stages"]), 2)
         self.assertEqual(entry["region"], "ascalon_pre_searing")
         self.assertEqual(entry["idVerification"]["status"], "verified_in_game")
-        evidence = next(e for e in entry["idVerification"]["evidence"] if e["kind"] == "in_game_game_link")
+        in_game = [e for e in entry["idVerification"]["evidence"] if e["kind"] == "in_game_game_link"]
+        self.assertEqual(len(in_game), 1)
+        evidence = in_game[0]
+        self.assertEqual(evidence["sourceId"], "in-game-f10-help-quest-1462-2026-11-27")
         self.assertEqual(evidence["value"], 1462)
         self.assertEqual(evidence["observedName"], "Getting Started in Guild Wars")
         self.assertEqual(evidence["campaignContext"], "prophecies")
@@ -239,6 +242,24 @@ class CatalogRejections(unittest.TestCase):
     def test_game_link_must_be_pre_redirect(self):
         self.assertIn("verified_observation_incomplete", self.mutate(lambda c: quest(c, "synthetic.quest_a")["idVerification"]["evidence"][0].update(preRedirect=False)))
 
+    def test_verified_rejects_name_taken_from_a_different_evidence_record(self):
+        def change(c):
+            evidence = quest(c, "synthetic.quest_a")["idVerification"]["evidence"]
+            link = evidence[0]
+            name = link.pop("observedName")
+            evidence.append({"kind": "name_match", "sourceId": "synthetic-wiki", "value": link["value"], "observedName": name})
+        self.assertIn("verified_observation_incomplete", self.mutate(change))
+
+    def test_verified_rejects_binding_fields_moved_onto_wiki_id_evidence(self):
+        def change(c):
+            entry = quest(c, "synthetic.quest_a")
+            link = entry["idVerification"]["evidence"][0]
+            wiki = {"kind": "wiki_infobox_id", "sourceId": "synthetic-wiki", "value": link["value"]}
+            for key in ("observedName", "campaignContext", "professionContext", "preRedirect"):
+                wiki[key] = link.pop(key)
+            entry["idVerification"]["evidence"].append(wiki)
+        self.assertIn("verified_observation_incomplete", self.mutate(change))
+
     def test_hand_looked_up_wiki_link_cannot_verify(self):
         def change(c):
             entry = quest(c, "synthetic.quest_c")
@@ -324,6 +345,17 @@ class Linking(unittest.TestCase):
         self.assertEqual(row(found["derived-monk-b"], 220)["linkState"], "ambiguous_candidate")
         self.assertEqual(row(found["derived-monk-a"], 84)["linkState"], "candidate")
         self.assertTrue(all(not c["prerequisites"] for c in found.values()))
+
+    def test_real_catalog_links_1462_while_unverified_84_stays_candidate(self):
+        catalog = real_catalog()
+        self.assertEqual(quest(catalog, "presearing.getting_started_in_guild_wars")["idVerification"]["status"], "verified_in_game")
+        self.assertEqual(quest(catalog, "presearing.monk_test")["idVerification"]["status"], "corroborated")
+        report = self.link(catalog, "export-presearing-derived.contract-v1.json")
+        character = characters(report)["derived-monk-a"]
+        self.assertEqual(row(character, 1462)["linkState"], "linked")
+        self.assertEqual(row(character, 84)["linkState"], "candidate")
+        linked_ids = {r["gameQuestId"] for c in characters(report).values() for r in c["quests"] if r["linkState"] == "linked"}
+        self.assertEqual(linked_ids, {1462})
 
     def test_real_ids_after_hypothetical_promotion(self):
         catalog = copy.deepcopy(real_catalog())
