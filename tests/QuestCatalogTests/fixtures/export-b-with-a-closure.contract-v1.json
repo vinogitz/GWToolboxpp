@@ -1,0 +1,60 @@
+{
+  "contract": "guild-wars-quest-progress",
+  "contractVersion": 1,
+  "producer": {
+    "name": "GWToolboxpp"
+  },
+  "exportedAt": "2026-11-26T09:00:00.000Z",
+  "fixtureNote": "Synthetic: A has probable reward evidence.",
+  "characters": [
+    {
+      "characterKey": "synthetic-char-2",
+      "displayName": "synthetic-char-2",
+      "isPreSearing": true,
+      "isPvp": false,
+      "primaryProfession": "3",
+      "missions": [],
+      "quests": [
+        {
+          "gameQuestId": 900101,
+          "state": "completed_observed",
+          "source": "game_event",
+          "confidence": "probable",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": [
+            {
+              "eventType": "completed",
+              "observedAt": "2026-11-26T08:59:00.000Z",
+              "state": "completed_observed",
+              "source": "game_event",
+              "confidence": "probable",
+              "payload": {
+                "evidenceKind": "reward"
+              }
+            }
+          ]
+        },
+        {
+          "gameQuestId": 900102,
+          "state": "active",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        }
+      ]
+    }
+  ]
+}

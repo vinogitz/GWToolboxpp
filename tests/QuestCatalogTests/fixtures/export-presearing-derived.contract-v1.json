@@ -1,0 +1,243 @@
+{
+  "contract": "guild-wars-quest-progress",
+  "contractVersion": 1,
+  "producer": {
+    "name": "GWToolboxpp"
+  },
+  "exportedAt": "2026-11-26T09:00:00.000Z",
+  "fixtureNote": "derived-*: gameQuestId/state/source/confidence/objective counts copied from local fork exports (2026-10..11) with character identity replaced. hypothetical-monk-d is invented: Further Adventures present without any Monk Test record.",
+  "characters": [
+    {
+      "characterKey": "derived-monk-a",
+      "displayName": "derived-monk-a",
+      "isPreSearing": true,
+      "isPvp": false,
+      "primaryProfession": "3",
+      "missions": [],
+      "quests": [
+        {
+          "gameQuestId": 54,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 56,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 84,
+          "state": "completed_observed",
+          "source": "game_event",
+          "confidence": "probable",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": true
+            },
+            {
+              "objectiveIndex": 1,
+              "isCompleted": false
+            }
+          ],
+          "history": [
+            {
+              "eventType": "completed",
+              "observedAt": "2026-11-26T08:59:00.000Z",
+              "state": "completed_observed",
+              "source": "game_event",
+              "confidence": "probable",
+              "payload": {
+                "evidenceKind": "reward"
+              }
+            }
+          ]
+        },
+        {
+          "gameQuestId": 1462,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": true
+            },
+            {
+              "objectiveIndex": 1,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        }
+      ]
+    },
+    {
+      "characterKey": "derived-monk-b",
+      "displayName": "derived-monk-b",
+      "isPreSearing": true,
+      "isPvp": false,
+      "primaryProfession": "3",
+      "missions": [],
+      "quests": [
+        {
+          "gameQuestId": 84,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 220,
+          "state": "completed_observed",
+          "source": "game_event",
+          "confidence": "probable",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": [
+            {
+              "eventType": "completed",
+              "observedAt": "2026-11-26T08:59:00.000Z",
+              "state": "completed_observed",
+              "source": "game_event",
+              "confidence": "probable",
+              "payload": {
+                "evidenceKind": "reward"
+              }
+            }
+          ]
+        },
+        {
+          "gameQuestId": 1462,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        }
+      ]
+    },
+    {
+      "characterKey": "derived-mesmer-c",
+      "displayName": "derived-mesmer-c",
+      "isPreSearing": true,
+      "isPvp": false,
+      "primaryProfession": "5",
+      "missions": [],
+      "quests": [
+        {
+          "gameQuestId": 81,
+          "state": "ready_for_reward",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": true
+            },
+            {
+              "objectiveIndex": 1,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 1462,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        }
+      ]
+    },
+    {
+      "characterKey": "hypothetical-monk-d",
+      "displayName": "hypothetical-monk-d",
+      "isPreSearing": true,
+      "isPvp": false,
+      "primaryProfession": "3",
+      "missions": [],
+      "quests": [
+        {
+          "gameQuestId": 54,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 1462,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": true
+            },
+            {
+              "objectiveIndex": 1,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        }
+      ]
+    }
+  ]
+}

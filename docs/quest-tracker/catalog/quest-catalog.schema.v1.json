@@ -1,0 +1,605 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gwtoolbox-quest-catalog.schema.v1.json",
+  "title": "GWToolbox fork quest catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "catalog",
+    "schemaVersion",
+    "catalogVersion",
+    "scope",
+    "dataCaptureReady",
+    "linkPolicy",
+    "sources",
+    "quests"
+  ],
+  "properties": {
+    "catalog": {
+      "const": "gwtoolbox-quest-catalog"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "catalogVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-z0-9.]+)?$"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "campaign",
+        "region",
+        "synthetic",
+        "taskSpec"
+      ],
+      "properties": {
+        "campaign": {
+          "$ref": "#/$defs/campaign"
+        },
+        "region": {
+          "$ref": "#/$defs/region"
+        },
+        "synthetic": {
+          "type": "boolean"
+        },
+        "taskSpec": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "dataCaptureReady": {
+      "enum": [
+        "NOT_READY",
+        "READY"
+      ]
+    },
+    "linkPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "autoLinkStatuses",
+        "candidateStatuses",
+        "neverLinkStatuses"
+      ],
+      "properties": {
+        "autoLinkStatuses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/idStatus"
+          }
+        },
+        "candidateStatuses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/idStatus"
+          }
+        },
+        "neverLinkStatuses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/idStatus"
+          }
+        }
+      }
+    },
+    "numberingEvidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/numberingEvidence"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "quests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/quest"
+      }
+    }
+  },
+  "$defs": {
+    "key": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*\\.[a-z0-9_]+$"
+    },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "campaign": {
+      "enum": [
+        "prophecies",
+        "factions",
+        "nightfall",
+        "eye_of_the_north",
+        "unknown"
+      ]
+    },
+    "region": {
+      "enum": [
+        "ascalon_pre_searing",
+        "unknown"
+      ]
+    },
+    "idStatus": {
+      "enum": [
+        "verified_in_game",
+        "corroborated",
+        "source_claimed",
+        "ambiguous",
+        "unknown"
+      ]
+    },
+    "evidenceKind": {
+      "enum": [
+        "in_game_game_link",
+        "producer_name_id_pair",
+        "toolbox_live_observation",
+        "repo_code_reference",
+        "gwca_constant",
+        "wiki_infobox_id",
+        "wiki_game_link",
+        "wiki_game_integration_table",
+        "wiki_page_id",
+        "name_match"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "title",
+        "retrievedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/sourceId"
+        },
+        "kind": {
+          "enum": [
+            "wiki_article",
+            "wiki_game_link",
+            "wiki_game_integration_table",
+            "wiki_template",
+            "repo_code",
+            "toolbox_live_export",
+            "synthetic_fixture"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "pageId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "revisionId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "revisionTimestamp": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+        },
+        "repoPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repoRevision": {
+          "type": "string",
+          "minLength": 7
+        },
+        "retrievedAt": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "numberingEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "sourceIds",
+        "result"
+      ],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sourceId"
+          }
+        },
+        "result": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "sourceId",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/evidenceKind"
+        },
+        "sourceId": {
+          "$ref": "#/$defs/sourceId"
+        },
+        "value": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "note": {
+          "type": "string"
+        },
+        "observedName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "campaignContext": {
+          "$ref": "#/$defs/campaign"
+        },
+        "professionContext": {
+          "enum": [
+            "warrior",
+            "ranger",
+            "monk",
+            "necromancer",
+            "mesmer",
+            "elementalist",
+            "any",
+            "unknown"
+          ]
+        },
+        "preRedirect": {
+          "type": "boolean"
+        }
+      }
+    },
+    "sourcedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId"
+      ],
+      "properties": {
+        "sourceId": {
+          "$ref": "#/$defs/sourceId"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "anyOf",
+        "sourceId",
+        "basis"
+      ],
+      "properties": {
+        "anyOf": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/key"
+          }
+        },
+        "sourceId": {
+          "$ref": "#/$defs/sourceId"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "followUp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "sourceId"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/key"
+        },
+        "sourceId": {
+          "$ref": "#/$defs/sourceId"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "outOfScopeFollowUp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "sourceId"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceId": {
+          "$ref": "#/$defs/sourceId"
+        }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "summary"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "quest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "name",
+        "campaign",
+        "region",
+        "questType",
+        "gameQuestId",
+        "candidateGameQuestIds",
+        "idVerification",
+        "sourceIds",
+        "objectives",
+        "completion",
+        "branching",
+        "requires_completion_of",
+        "related_follow_up"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/key"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "campaign": {
+          "$ref": "#/$defs/campaign"
+        },
+        "region": {
+          "$ref": "#/$defs/region"
+        },
+        "questType": {
+          "enum": [
+            "primary",
+            "secondary",
+            "skill",
+            "minigame",
+            "unknown"
+          ]
+        },
+        "profession": {
+          "enum": [
+            "warrior",
+            "ranger",
+            "monk",
+            "necromancer",
+            "mesmer",
+            "elementalist",
+            "any",
+            "unknown"
+          ]
+        },
+        "reforgedModeOnly": {
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        },
+        "gameQuestId": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "candidateGameQuestIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "idVerification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence"
+          ],
+          "properties": {
+            "status": {
+              "$ref": "#/$defs/idStatus"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/evidence"
+              }
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sourceId"
+          }
+        },
+        "objectives": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model",
+            "stages"
+          ],
+          "properties": {
+            "model": {
+              "enum": [
+                "single",
+                "sequential_same_id",
+                "unknown"
+              ]
+            },
+            "stages": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/stage"
+              }
+            },
+            "sourceId": {
+              "$ref": "#/$defs/sourceId"
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "completion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "reward_dialogue",
+                "automatic_on_objective",
+                "unknown"
+              ]
+            },
+            "npc": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceId": {
+              "$ref": "#/$defs/sourceId"
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "branching": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "none_stated",
+                "profession_variant",
+                "mutually_exclusive",
+                "parallel_unlock",
+                "unknown"
+              ]
+            },
+            "sourceId": {
+              "$ref": "#/$defs/sourceId"
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "requires_completion_of": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requirement"
+          }
+        },
+        "related_follow_up": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/followUp"
+          }
+        },
+        "outOfScopeFollowUps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/outOfScopeFollowUp"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourcedText"
+          }
+        }
+      }
+    }
+  }
+}
