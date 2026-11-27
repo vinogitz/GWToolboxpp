@@ -1,13 +1,13 @@
 # Forrás- és ID-ellenőrzési jegyzék — Pre-Searing pilot
 
-TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · katalógus `0.2.0-pilot` · wiki-lekérés: 2026-11-26 · első játékbeli rögzítés: 2026-11-27 · `DATA_CAPTURE_READY=NOT_READY`
+TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · katalógus `0.3.0-pilot` · wiki-lekérés: 2026-11-26 · játékbeli rögzítés: 2026-11-27 · `DATA_CAPTURE_READY=NOT_READY`
 
 ## Szabály
 
 - A wiki oldalazonosító (`pageId`) és a névegyezés önmagában nem igazol játékbeli ID-t. A `pageId` csak a forrásverzió rögzítésére szolgál.
 - A `Game link:Quest N` oldalak a játék beépített súgólinkjeinek céljai, amelyeket wiki-szerkesztők irányítanak át. Ha valaki kézzel keresi meg őket, wiki ID-forrásnak számítanak, nem játékbeli rögzítésnek. Csak a játékból indított, átirányítás előtti link számít játékbeli megfigyelésnek (lásd lent).
 - A helyi Toolbox exportokban a `questName` és a célszöveg üres, így azok csak azt mutatják, hogy egy ID milyen kontextusban (Pre-Searing, profession) jelent meg. Nevet nem kötnek ID-hoz.
-- `verified_in_game` státuszhoz a lenti szabály szerinti játékbeli megfigyelés kell. A pilotban egy ilyen megfigyelés van: Getting Started in Guild Wars (`1462`), lásd a rögzítési jegyzőkönyvet lent.
+- `verified_in_game` státuszhoz a lenti szabály szerinti játékbeli megfigyelés kell. A pilotban két ilyen megfigyelés van: Getting Started in Guild Wars (`1462`) és Monk Test (`84`), lásd a rögzítési jegyzőkönyveket lent.
 
 ## Számozási tér keresztellenőrzése
 
@@ -24,7 +24,7 @@ TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · katalógus `0.2.0-pilot` · wiki-
 - Nem elég: kézzel megkeresett wiki-link vagy `Game link:Quest N` oldal, névegyezés, wiki oldalazonosító, név nélküli export (a mostani helyi exportok ilyenek), upstream kódmegjegyzés vagy GWCA konstans.
 - `corroborated` és `source_claimed` marad jelölt (`candidate`). Automatikus kapcsolás (`linked`) kizárólag `verified_in_game` esetén van.
 - A validátor kényszeríti: a bizonyíték `observedName`-je egyezzen a bejegyzés nevével, a `campaignContext` a kampánnyal, a `professionContext` ne legyen `unknown`, és `in_game_game_link` esetén `preRedirect` legyen igaz.
-- A validátor nem tárolja strukturáltan, honnan származik az átirányítás előtti cím (címsor, `rdfrom` vagy „Redirected from” sor): ezt a forrás `url` mezője és a bizonyíték `note` mezője rögzíti. A `preRedirect: true` azt jelenti, hogy a `Game link:Quest N` érték az átirányítás előtti cím, akkor is, ha azt az `rdfrom` paraméterből olvastuk ki.
+- A validátor nem tárolja strukturáltan, honnan származik az átirányítás előtti cím (címsor, `rdfrom` vagy „Redirected from” sor): ezt a forrás `url` mezője és a bizonyíték `note` mezője rögzíti. A `preRedirect: true` azt jelenti, hogy a `Game link:Quest N` érték az átirányítás előtti cím, akkor is, ha azt az `rdfrom` paraméterből olvastuk ki. Ha a hivatkozott forrás `url` mezőjében van `rdfrom`, és abból kiolvasható a `Game link:Quest N` azonosító, a validátor ellenőrzi, hogy az N egyezik a bizonyíték `value` mezőjével.
 
 ## Bejegyzések
 
@@ -34,7 +34,7 @@ TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · katalógus `0.2.0-pilot` · wiki-
 | `presearing.war_preparations` | War Preparations | null (jelöltek: 35, 217, 218, 219, 220, 221, 222) | `ambiguous` | `wiki_infobox_id`=219 (gww-war-preparations); `wiki_game_link`=35 (gww-game-link-quest-35); `wiki_game_link`=220 (gww-game-link-quest-220); `wiki_game_integration_table`=35 (gww-game-integration-quests-0-499); `toolbox_live_observation`=220 (toolbox-live-exports-2026-11) | Name match cannot select an id: seven ids redirect to the same article and the disambiguation page describes six Pre-Searing variants. Never auto-linked. |
 | `presearing.warrior_test` | Warrior Test | 85 | `source_claimed` | `wiki_infobox_id`=85 (gww-warrior-test); `wiki_game_link`=85 (gww-game-link-quest-85); `wiki_game_integration_table`=85 (gww-game-integration-quests-0-499) | Wiki sources only; not observed in local exports. |
 | `presearing.ranger_test` | Ranger Test | 86 | `source_claimed` | `wiki_infobox_id`=86 (gww-ranger-test); `wiki_game_link`=86 (gww-game-link-quest-86); `wiki_game_integration_table`=86 (gww-game-integration-quests-0-499) | Wiki sources only; not observed in local exports. |
-| `presearing.monk_test` | Monk Test | 84 | `corroborated` | `wiki_infobox_id`=84 (gww-monk-test); `wiki_game_link`=84 (gww-game-link-quest-84); `wiki_game_integration_table`=84 (gww-game-integration-quests-0-499); `toolbox_live_observation`=84 (toolbox-live-exports-2026-11) | Wiki id sources plus profession-consistent live observation; no in-game name/text capture yet. |
+| `presearing.monk_test` | Monk Test | 84 | `verified_in_game` | `in_game_game_link`=84 (in-game-f10-help-quest-84-2026-11-27); `wiki_infobox_id`=84 (gww-monk-test); `wiki_game_link`=84 (gww-game-link-quest-84); `wiki_game_integration_table`=84 (gww-game-integration-quests-0-499); `toolbox_live_observation`=84 (toolbox-live-exports-2026-11) | 2026-11-27 F10 Help panel, Toolbox nélkül, Pre-Searing Monk. Az átirányítás előtti cím az `rdfrom` paraméterből: `Game_link:Quest_84`. Automatikusan kapcsolható. |
 | `presearing.necromancer_test` | Necromancer Test | 82 | `source_claimed` | `wiki_infobox_id`=82 (gww-necromancer-test); `wiki_game_link`=82 (gww-game-link-quest-82); `wiki_game_integration_table`=82 (gww-game-integration-quests-0-499) | Wiki sources only; not observed in local exports. |
 | `presearing.mesmer_test` | Mesmer Test | 81 | `corroborated` | `wiki_infobox_id`=81 (gww-mesmer-test); `wiki_game_link`=81 (gww-game-link-quest-81); `wiki_game_integration_table`=81 (gww-game-integration-quests-0-499); `toolbox_live_observation`=81 (toolbox-live-exports-2026-11) | Wiki id sources plus profession-consistent live observation; no in-game name/text capture yet. |
 | `presearing.elementalist_test` | Elementalist Test | 83 | `source_claimed` | `wiki_infobox_id`=83 (gww-elementalist-test); `wiki_game_link`=83 (gww-game-link-quest-83); `wiki_game_integration_table`=83 (gww-game-integration-quests-0-499) | Wiki sources only; not observed in local exports. |
@@ -98,6 +98,7 @@ További Pre-Searing ID-k is megjelentek, ezek a pilot hatókörén kívül esne
 | `repo-gwca-questids` | `repo_code` | GWCA Constants QuestID enum | blob 348074fcb3942e44311249bcd0dd0dbfd8719269 | Dependencies/GWCA/include/GWCA/Constants/QuestIDs.h |
 | `toolbox-live-exports-2026-11` | `toolbox_live_export` | Local Quest Progress Contract v1 exports of this fork (SZABOBE16IRX9 profile, 2026-10-17..2026-11-25) | — | helyi, nem a repóban |
 | `in-game-f10-help-quest-1462-2026-11-27` | `wiki_game_link` | F10 Help panel Game link capture for Quest 1462 (Bence, 2026-11-27) | — (élő kliens, nem wiki-revízió) | https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_1462%26redirect%3Dno |
+| `in-game-f10-help-quest-84-2026-11-27` | `wiki_game_link` | F10 Help panel Game link capture for Quest 84 (Bence, 2026-11-27) | — (élő kliens, nem wiki-revízió) | https://wiki.guildwars.com/wiki/Monk_Test?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_84%26redirect%3Dno |
 
 A wiki revíziók a `https://wiki.guildwars.com/index.php?oldid=<revisionId>` címen érhetők el. A katalógus leírásai saját megfogalmazású, tényszerű összefoglalók; a forrást az URL és a revízió azonosítja.
 
@@ -112,3 +113,13 @@ A wiki revíziók a `https://wiki.guildwars.com/index.php?oldid=<revisionId>` c�
 - Az átirányítás előtti cím az `rdfrom` paraméterből: `Game_link:Quest_1462`. A „Redirected from” sor nem jelent meg: a wiki `ingame-help` előtagja elnyomja, és az `rdfrom`-os céloldal 403-at ad.
 - Ez a 403 várható, nem azt jelenti, hogy a Help rossz cikkre visz. A kliens a `Game_link:Quest_1462` címet nyitja; a wiki 302-vel az `rdfrom` lekérdezést fűzi a cikkre, és a wiki terheléselosztója ezt a lekérdezést 403-mal utasítja el. A cikk `https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars` `rdfrom` nélkül elérhető. A Toolbox ugyanezt a 403-at kerülve a feloldott cikket nyitja, ezért a pre-redirect érték rögzítéséhez Toolbox nélkül kellett a Help panelt használni.
 - Státusz: `verified_in_game`. A 1462 ettől automatikusan kapcsolható (`linked`). Ebből nem következik más küldetés lezárása.
+
+## Játékbeli rögzítés — Monk Test (84)
+
+- Dátum: 2026-11-27 (Europe/Budapest, UTC+1). Rögzítette: Bence. Képernyőkép nem készült; az URL szövegként érkezett.
+- Kontextus: Pre-Searing, elsődleges szakma Monk. A küldetés bent volt a naplóban. A naplóban látható név: Monk Test. A katalógus `campaign` mezője `prophecies`, a Pre-Searing a `region` (`ascalon_pre_searing`); a bizonyíték `campaignContext` értéke ezért `prophecies`, a Pre-Searing a megjegyzésben szerepel.
+- Módszer: a vanilla kliens Help panelje (F10), Toolbox nélkül. A Community Wiki / Quests listában a küldetés linkjére kattintott.
+- A böngészőben megnyílt URL:
+  `https://wiki.guildwars.com/wiki/Monk_Test?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_84%26redirect%3Dno`
+- Az átirányítás előtti cím az `rdfrom` paraméterből: `Game_link:Quest_84`. A játék ezt az ID-t nyitotta meg; a 84-et vártuk, és ez egyezett.
+- Státusz: `verified_in_game`. A 84 ettől automatikusan kapcsolható (`linked`). Ebből nem következik más küldetés lezárása.

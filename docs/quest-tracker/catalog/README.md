@@ -1,12 +1,12 @@
 # Pre-Searing küldetéskatalógus (pilot) — adatleírás
 
-TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · `catalogVersion` `0.2.0-pilot` · `schemaVersion` `1` · `DATA_CAPTURE_READY=NOT_READY`
+TaskSpec: `TOOLBOX-QUEST-CATALOG-CHAINS-01` · `catalogVersion` `0.3.0-pilot` · `schemaVersion` `1` · `DATA_CAPTURE_READY=NOT_READY`
 
 Verziózott, offline használható, géppel olvasható katalógus. Hálózat és build nélkül, Python 3 standard könyvtárral validálható és köthető Contract v1 exporthoz. A producer, a Contract v1 és a Wayfarer változatlan: a katalógus külön adatréteg, nem Contract mező, és nem kerül az exportba.
 
 | Fájl | Szerep |
 | --- | --- |
-| `presearing-quest-catalog.v1.json` | A katalógus (10 bejegyzés, 30 forrás) |
+| `presearing-quest-catalog.v1.json` | A katalógus (10 bejegyzés, 31 forrás) |
 | `quest-catalog.schema.v1.json` | JSON Schema (draft 2020-12), ezt a validátor is betölti |
 | `source-and-id-register.md` | Forrás- és ID-ellenőrzési jegyzék |
 | `../../../scripts/quest_catalog.py` | `validate` és `link` parancs |
@@ -48,7 +48,7 @@ Verziózott, offline használható, géppel olvasható katalógus. Hálózat és
 
 A `verified_in_game` bizonyíték kötelező mezői: `observedName` (egyezik a bejegyzés `name` mezőjével), `campaignContext` (egyezik a `campaign` mezővel), `professionContext` (nem `unknown`), és `in_game_game_link` esetén `preRedirect: true`. Részletes szabály: [source-and-id-register.md](source-and-id-register.md).
 
-A `wiki_page_id` és a `name_match` bizonyíték rögzíthető, de egyik státuszt sem támasztja alá. A `linkPolicy.autoLinkStatuses` nem tartalmazhat ellenőrizetlen státuszt, ezt a validátor hibának veszi. A pilotban egy bejegyzés `verified_in_game`: `presearing.getting_started_in_guild_wars` (`1462`), 2026-11-27-i F10 Help panel rögzítés alapján (Toolbox nélkül; az átirányítás előtti `Game_link:Quest_1462` cím az `rdfrom` paraméterből, a lap 403-at adott). A többi bejegyzés nem automatikus kapcsolású.
+A `wiki_page_id` és a `name_match` bizonyíték rögzíthető, de egyik státuszt sem támasztja alá. A `linkPolicy.autoLinkStatuses` nem tartalmazhat ellenőrizetlen státuszt, ezt a validátor hibának veszi. A `verified_in_game` forrás `url` mezőjében, ha van `rdfrom` és abból kiolvasható a `Game link:Quest N` azonosító, a validátor ellenőrzi, hogy az N egyezik a bizonyíték `value` mezőjével. A pilotban két bejegyzés `verified_in_game`: `presearing.getting_started_in_guild_wars` (`1462`) és `presearing.monk_test` (`84`), mindkettő 2026-11-27-i F10 Help panel rögzítés alapján (Toolbox nélkül; az átirányítás előtti `Game_link:Quest_1462` illetve `Game_link:Quest_84` cím az `rdfrom` paraméterből). A többi bejegyzés nem automatikus kapcsolású.
 
 ## Idézetek
 
@@ -57,7 +57,7 @@ A katalógus, a fixture-ök és a dokumentáció nem tartalmaz szó szerinti wik
 ## Két pilot eset
 
 1. **Célváltás ugyanazzal a `gameQuestId`-val:** `presearing.getting_started_in_guild_wars` (`1462`, `sequential_same_id`, 5 forrásolt szakasz). A helyi exportban ugyanazon az ID-n 1 → 2 célt és az első cél teljesülését láttuk. Ugyanez a minta a profession testeknél (`84`, `81`) is.
-2. **Külön ID-jű küldetések lánca:** `presearing.war_preparations` (`ambiguous`, `null`) → `presearing.monk_test` (`84`) → `presearing.further_adventures` (`54`). A War Preparations kihagyható, ezért csak `related_follow_up`. A Further Adventures `requires_completion_of` mezője a hat profession test `anyOf` csoportja a `Standard prerequisites` sablon alapján.
+2. **Külön ID-jű küldetések lánca:** `presearing.war_preparations` (`ambiguous`, `null`) → `presearing.monk_test` (`84`, `verified_in_game`) → `presearing.further_adventures` (`54`, `corroborated`). A War Preparations kihagyható, ezért csak `related_follow_up`. A Further Adventures `requires_completion_of` mezője a hat profession test `anyOf` csoportja a `Standard prerequisites` sablon alapján.
 
 ## Offline kötés exporthoz
 

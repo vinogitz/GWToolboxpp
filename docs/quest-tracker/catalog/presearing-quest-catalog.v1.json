@@ -1,7 +1,7 @@
 {
   "catalog": "gwtoolbox-quest-catalog",
   "schemaVersion": 1,
-  "catalogVersion": "0.2.0-pilot",
+  "catalogVersion": "0.3.0-pilot",
   "scope": {
     "campaign": "prophecies",
     "region": "ascalon_pre_searing",
@@ -343,6 +343,14 @@
       "url": "https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_1462%26redirect%3Dno",
       "retrievedAt": "2026-11-27",
       "note": "Opened from the vanilla Guild Wars Help panel (F10) with Toolbox not loaded, on a Pre-Searing primary Monk, with the quest in the log. The browser landed on this URL and the page returned HTTP 403. The pre-redirect title Game_link:Quest_1462 is taken from the rdfrom query parameter. Captured by Bence as URL text; no screenshot. Time: about 02:55 Europe/Budapest."
+    },
+    {
+      "id": "in-game-f10-help-quest-84-2026-11-27",
+      "kind": "wiki_game_link",
+      "title": "F10 Help panel Game link capture for Quest 84 (Bence, 2026-11-27)",
+      "url": "https://wiki.guildwars.com/wiki/Monk_Test?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_84%26redirect%3Dno",
+      "retrievedAt": "2026-11-27",
+      "note": "Opened from the vanilla Guild Wars Help panel (F10) with Toolbox not loaded, on a Pre-Searing primary Monk, with the quest in the log. The pre-redirect title Game_link:Quest_84 is taken from the rdfrom query parameter of the captured URL. Captured by Bence as URL text; no screenshot. Date: 2026-11-27, Europe/Budapest."
     }
   ],
   "quests": [
@@ -742,7 +750,7 @@
       "gameQuestId": 84,
       "candidateGameQuestIds": [],
       "idVerification": {
-        "status": "corroborated",
+        "status": "verified_in_game",
         "evidence": [
           {
             "kind": "wiki_infobox_id",
@@ -764,15 +772,26 @@
             "sourceId": "toolbox-live-exports-2026-11",
             "value": 84,
             "note": "Seen only on monk-primary characters (2): one at 1 objective, one at 2 objectives with objective 0 completed plus reward evidence (completed_observed/probable)."
+          },
+          {
+            "kind": "in_game_game_link",
+            "sourceId": "in-game-f10-help-quest-84-2026-11-27",
+            "value": 84,
+            "observedName": "Monk Test",
+            "campaignContext": "prophecies",
+            "professionContext": "monk",
+            "preRedirect": true,
+            "note": "Quest log name observed as Monk Test. Region context: Pre-Searing (ascalon_pre_searing); campaignContext is prophecies because that is the catalog campaign field. Primary profession Monk. Method: F10 Help panel, Toolbox not loaded. The pre-redirect title Game_link:Quest_84 was taken from the rdfrom parameter of the captured URL, not from a Redirected from page header. Captured by Bence on 2026-11-27, as URL text, no screenshot."
           }
         ],
-        "note": "Wiki id sources plus profession-consistent live observation; no in-game name/text capture yet."
+        "note": "In-game F10 Help panel capture on 2026-11-27 binds the quest-log name to Game_link:Quest_84 (rdfrom parameter of the captured URL). Auto-linkable."
       },
       "sourceIds": [
         "gww-monk-test",
         "gww-game-link-quest-84",
         "gww-game-integration-quests-0-499",
-        "toolbox-live-exports-2026-11"
+        "toolbox-live-exports-2026-11",
+        "in-game-f10-help-quest-84-2026-11-27"
       ],
       "objectives": {
         "model": "sequential_same_id",

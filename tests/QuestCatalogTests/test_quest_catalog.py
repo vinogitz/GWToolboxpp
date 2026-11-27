@@ -59,7 +59,7 @@ class CatalogValidity(unittest.TestCase):
         self.assertEqual(catalog["dataCaptureReady"], "NOT_READY")
         self.assertFalse(catalog["scope"]["synthetic"])
         self.assertEqual(catalog["linkPolicy"]["autoLinkStatuses"], ["verified_in_game"])
-        self.assertEqual([q["key"] for q in catalog["quests"] if q["idVerification"]["status"] == "verified_in_game"], ["presearing.getting_started_in_guild_wars"])
+        self.assertEqual([q["key"] for q in catalog["quests"] if q["idVerification"]["status"] == "verified_in_game"], ["presearing.getting_started_in_guild_wars", "presearing.monk_test"])
 
     def test_war_preparations_unchanged_ambiguous(self):
         catalog = real_catalog()
@@ -117,7 +117,32 @@ class CatalogValidity(unittest.TestCase):
         source = next(s for s in real_catalog()["sources"] if s["id"] == evidence["sourceId"])
         self.assertIn("rdfrom=", source["url"])
         self.assertIn("Game_link:Quest_1462", urllib.parse.unquote(source["url"]))
+        self.assertEqual(qc.game_link_id_from_rdfrom(source["url"]), 1462)
         self.assertIn("403", evidence["note"])
+        self.assertIn("rdfrom", evidence["note"])
+        self.assertIn("F10 Help panel", evidence["note"])
+        self.assertIn("Toolbox not loaded", evidence["note"])
+
+
+    def test_case_monk_test_verified_in_game(self):
+        entry = quest(real_catalog(), "presearing.monk_test")
+        self.assertEqual(entry["gameQuestId"], 84)
+        self.assertEqual(entry["region"], "ascalon_pre_searing")
+        self.assertEqual(entry["profession"], "monk")
+        self.assertEqual(entry["idVerification"]["status"], "verified_in_game")
+        in_game = [e for e in entry["idVerification"]["evidence"] if e["kind"] == "in_game_game_link"]
+        self.assertEqual(len(in_game), 1)
+        evidence = in_game[0]
+        self.assertEqual(evidence["sourceId"], "in-game-f10-help-quest-84-2026-11-27")
+        self.assertEqual(evidence["value"], 84)
+        self.assertEqual(evidence["observedName"], "Monk Test")
+        self.assertEqual(evidence["campaignContext"], "prophecies")
+        self.assertEqual(evidence["professionContext"], "monk")
+        self.assertIs(evidence["preRedirect"], True)
+        source = next(s for s in real_catalog()["sources"] if s["id"] == evidence["sourceId"])
+        self.assertIn("rdfrom=", source["url"])
+        self.assertIn("Game_link:Quest_84", urllib.parse.unquote(source["url"]))
+        self.assertEqual(qc.game_link_id_from_rdfrom(source["url"]), 84)
         self.assertIn("rdfrom", evidence["note"])
         self.assertIn("F10 Help panel", evidence["note"])
         self.assertIn("Toolbox not loaded", evidence["note"])
@@ -260,6 +285,13 @@ class CatalogRejections(unittest.TestCase):
             entry["idVerification"]["evidence"].append(wiki)
         self.assertIn("verified_observation_incomplete", self.mutate(change))
 
+
+    def test_in_game_rdfrom_must_match_evidence_value(self):
+        def change(c):
+            source = next(s for s in c["sources"] if s["id"] == "synthetic-fixture")
+            source["url"] = "https://wiki.guildwars.com/wiki/Synthetic_Quest_A?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_900199%26redirect%3Dno"
+        self.assertIn("in_game_rdfrom_id_mismatch", self.mutate(change))
+
     def test_hand_looked_up_wiki_link_cannot_verify(self):
         def change(c):
             entry = quest(c, "synthetic.quest_c")
@@ -336,26 +368,30 @@ class Linking(unittest.TestCase):
         self.assertEqual(row(found["synthetic-char-4"], 900102)["linkState"], "linked")
         self.assertIn("synthetic-char-3", found)
 
-    def test_real_catalog_autolinks_only_verified_getting_started(self):
+    def test_real_catalog_autolinks_only_verified_getting_started_and_monk_test(self):
         report = self.link(real_catalog(), "export-presearing-derived.contract-v1.json")
-        self.assertEqual(report["counts"], {"ambiguous_candidate": 1, "candidate": 6, "linked": 4})
+        self.assertEqual(report["counts"], {"ambiguous_candidate": 1, "candidate": 4, "linked": 6})
         found = characters(report)
         for key in ("derived-monk-a", "derived-monk-b", "derived-mesmer-c", "hypothetical-monk-d"):
             self.assertEqual(row(found[key], 1462)["linkState"], "linked")
+        self.assertEqual(row(found["derived-monk-a"], 84)["linkState"], "linked")
+        self.assertEqual(row(found["derived-monk-b"], 84)["linkState"], "linked")
         self.assertEqual(row(found["derived-monk-b"], 220)["linkState"], "ambiguous_candidate")
-        self.assertEqual(row(found["derived-monk-a"], 84)["linkState"], "candidate")
+        self.assertEqual(row(found["derived-monk-a"], 54)["linkState"], "candidate")
         self.assertTrue(all(not c["prerequisites"] for c in found.values()))
 
-    def test_real_catalog_links_1462_while_unverified_84_stays_candidate(self):
+    def test_real_catalog_links_1462_and_84_while_unverified_54_stays_candidate(self):
         catalog = real_catalog()
         self.assertEqual(quest(catalog, "presearing.getting_started_in_guild_wars")["idVerification"]["status"], "verified_in_game")
-        self.assertEqual(quest(catalog, "presearing.monk_test")["idVerification"]["status"], "corroborated")
+        self.assertEqual(quest(catalog, "presearing.monk_test")["idVerification"]["status"], "verified_in_game")
+        self.assertEqual(quest(catalog, "presearing.further_adventures")["idVerification"]["status"], "corroborated")
         report = self.link(catalog, "export-presearing-derived.contract-v1.json")
         character = characters(report)["derived-monk-a"]
         self.assertEqual(row(character, 1462)["linkState"], "linked")
-        self.assertEqual(row(character, 84)["linkState"], "candidate")
+        self.assertEqual(row(character, 84)["linkState"], "linked")
+        self.assertEqual(row(character, 54)["linkState"], "candidate")
         linked_ids = {r["gameQuestId"] for c in characters(report).values() for r in c["quests"] if r["linkState"] == "linked"}
-        self.assertEqual(linked_ids, {1462})
+        self.assertEqual(linked_ids, {84, 1462})
 
     def test_real_ids_after_hypothetical_promotion(self):
         catalog = copy.deepcopy(real_catalog())

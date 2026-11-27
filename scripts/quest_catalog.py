@@ -3,6 +3,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 
 CATALOG_ID = "gwtoolbox-quest-catalog"
 REPORT_ID = "gwtoolbox-quest-catalog-link-report"
@@ -105,6 +106,23 @@ def find_required_cycles(quests_by_key):
     return cycles
 
 
+GAME_LINK_TITLE_RE = re.compile(r"Game[_ ]link:Quest[_ ](\d+)", re.IGNORECASE)
+
+
+def game_link_id_from_rdfrom(url):
+    if not isinstance(url, str):
+        return None
+    rdfrom_vals = urllib.parse.parse_qs(urllib.parse.urlparse(url).query).get("rdfrom")
+    if not rdfrom_vals:
+        return None
+    raw = rdfrom_vals[0]
+    inner = urllib.parse.urlparse(raw)
+    titles = urllib.parse.parse_qs(inner.query).get("title")
+    haystack = titles[0] if titles else urllib.parse.unquote(inner.path or "")
+    match = GAME_LINK_TITLE_RE.search(haystack) or GAME_LINK_TITLE_RE.search(raw)
+    return int(match.group(1)) if match else None
+
+
 def in_game_observation_binds(evidence, quest):
     if evidence.get("observedName") != quest["name"] or evidence.get("campaignContext") != quest["campaign"]:
         return False
@@ -125,6 +143,7 @@ def validate_catalog(catalog, schema):
     for sid in sorted({s for s in source_ids if source_ids.count(s) > 1}):
         err("duplicate_source_id", "$.sources", sid)
     known_sources = set(source_ids)
+    sources_by_id = {s["id"]: s for s in catalog["sources"]}
 
     policy = catalog["linkPolicy"]
     buckets = [set(policy["autoLinkStatuses"]), set(policy["candidateStatuses"]), set(policy["neverLinkStatuses"])]
@@ -181,6 +200,13 @@ def validate_catalog(catalog, schema):
         evidence = q["idVerification"]["evidence"]
         kinds = {e["kind"] for e in evidence}
         identifying = [e for e in evidence if e["kind"] not in NON_IDENTIFYING_KINDS]
+        for e in evidence:
+            if e.get("kind") != "in_game_game_link":
+                continue
+            source = sources_by_id.get(e.get("sourceId"))
+            parsed = game_link_id_from_rdfrom((source or {}).get("url"))
+            if parsed is not None and parsed != e.get("value"):
+                err("in_game_rdfrom_id_mismatch", path, f"rdfrom Game link:Quest {parsed} != value {e.get('value')}")
         if status in ("ambiguous", "unknown"):
             if game_id is not None:
                 err("status_requires_null_id", path, f"{status} entries must not carry gameQuestId")
