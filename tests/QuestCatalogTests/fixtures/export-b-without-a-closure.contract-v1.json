@@ -1,0 +1,106 @@
+{
+  "contract": "guild-wars-quest-progress",
+  "contractVersion": 1,
+  "producer": {
+    "name": "GWToolboxpp"
+  },
+  "exportedAt": "2026-11-26T09:00:00.000Z",
+  "fixtureNote": "Synthetic: B and E present, A without closure evidence, C candidate only, 900999 unknown to the catalog.",
+  "characters": [
+    {
+      "characterKey": "synthetic-char-1",
+      "displayName": "synthetic-char-1",
+      "isPreSearing": true,
+      "isPvp": false,
+      "primaryProfession": "3",
+      "missions": [],
+      "quests": [
+        {
+          "gameQuestId": 900101,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": true
+            },
+            {
+              "objectiveIndex": 1,
+              "isCompleted": false
+            }
+          ],
+          "history": [
+            {
+              "eventType": "observation",
+              "observedAt": "2026-11-26T08:00:00.000Z",
+              "state": "active",
+              "source": "game_event",
+              "confidence": "confirmed",
+              "payload": {
+                "evidenceKind": "accepted"
+              }
+            }
+          ]
+        },
+        {
+          "gameQuestId": 900102,
+          "state": "active",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 900103,
+          "state": "active",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 900104,
+          "state": "active",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        },
+        {
+          "gameQuestId": 900999,
+          "state": "active",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "contract": "guild-wars-quest-progress",
+  "contractVersion": 1,
+  "producer": {
+    "name": "GWToolboxpp"
+  },
+  "exportedAt": "2026-11-26T09:00:00.000Z",
+  "fixtureNote": "Synthetic: only B present.",
+  "characters": [
+    {
+      "characterKey": "synthetic-char-3",
+      "displayName": "synthetic-char-3",
+      "isPreSearing": true,
+      "isPvp": false,
+      "primaryProfession": "3",
+      "missions": [],
+      "quests": [
+        {
+          "gameQuestId": 900102,
+          "state": "objective_progress",
+          "source": "game_snapshot",
+          "confidence": "confirmed",
+          "observedAt": "2026-11-26T09:00:00.000Z",
+          "objectives": [
+            {
+              "objectiveIndex": 0,
+              "isCompleted": false
+            }
+          ],
+          "history": []
+        }
+      ]
+    }
+  ]
+}

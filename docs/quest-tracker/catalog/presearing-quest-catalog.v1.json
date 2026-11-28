@@ -1,0 +1,1320 @@
+{
+  "catalog": "gwtoolbox-quest-catalog",
+  "schemaVersion": 1,
+  "catalogVersion": "0.3.0-pilot",
+  "scope": {
+    "campaign": "prophecies",
+    "region": "ascalon_pre_searing",
+    "synthetic": false,
+    "taskSpec": "TOOLBOX-QUEST-CATALOG-CHAINS-01",
+    "note": "Pilot subset: same-id objective change (Getting Started in Guild Wars) and a separate-id chain (War Preparations -> <Profession> Test -> Further Adventures)."
+  },
+  "dataCaptureReady": "NOT_READY",
+  "linkPolicy": {
+    "autoLinkStatuses": [
+      "verified_in_game"
+    ],
+    "candidateStatuses": [
+      "corroborated",
+      "source_claimed"
+    ],
+    "neverLinkStatuses": [
+      "ambiguous",
+      "unknown"
+    ]
+  },
+  "numberingEvidence": [
+    {
+      "claim": "GWCA QuestID numbering equals the wiki Game link:Quest numbering",
+      "sourceIds": [
+        "repo-gwca-questids",
+        "gww-game-integration-quests-0-499",
+        "gww-game-integration-quests-500-999",
+        "gww-game-integration-quests-1000-1499"
+      ],
+      "result": "241 GWCA QuestID values: 226 same name, 14 same quest with abbreviated/variant spelling, 1 (1181) absent from the wiki table, 0 contradictions. Supports the numbering space only; binds no Pre-Searing quest."
+    }
+  ],
+  "sources": [
+    {
+      "id": "gww-game-integration-quests-0-499",
+      "kind": "wiki_game_integration_table",
+      "title": "Guild Wars Wiki:Game integration/Quests/0..499",
+      "url": "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Game_integration/Quests/0..499",
+      "pageId": 39326,
+      "revisionId": 2532784,
+      "revisionTimestamp": "2013-02-03T21:59:07Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Table of Game link:Quest N redirects (the in-game help link target); maps numeric quest IDs to article titles."
+    },
+    {
+      "id": "gww-game-integration-quests-500-999",
+      "kind": "wiki_game_integration_table",
+      "title": "Guild Wars Wiki:Game integration/Quests/500..999",
+      "url": "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Game_integration/Quests/500..999",
+      "pageId": 199461,
+      "revisionId": 2558929,
+      "revisionTimestamp": "2013-11-21T07:45:24Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Used only for the GWCA numbering cross-check."
+    },
+    {
+      "id": "gww-game-integration-quests-1000-1499",
+      "kind": "wiki_game_integration_table",
+      "title": "Guild Wars Wiki:Game integration/Quests/1000..1499",
+      "url": "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Game_integration/Quests/1000..1499",
+      "pageId": 205601,
+      "revisionId": 2729407,
+      "revisionTimestamp": "2026-05-31T21:17:09Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-getting-started-in-guild-wars",
+      "kind": "wiki_article",
+      "title": "Getting Started in Guild Wars",
+      "url": "https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars",
+      "pageId": 320696,
+      "revisionId": 2741623,
+      "revisionTimestamp": "2026-09-23T21:23:17Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-1462",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 1462",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_1462",
+      "pageId": 320697,
+      "revisionId": 2729073,
+      "revisionTimestamp": "2026-05-27T20:55:37Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article of the same name."
+    },
+    {
+      "id": "gww-war-preparations",
+      "kind": "wiki_article",
+      "title": "War Preparations",
+      "url": "https://wiki.guildwars.com/wiki/War_Preparations",
+      "pageId": 3286,
+      "revisionId": 2741375,
+      "revisionTimestamp": "2026-09-21T23:05:30Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Single article for several same-named quests; infobox id = 219."
+    },
+    {
+      "id": "gww-war-preparations-disambiguation",
+      "kind": "wiki_article",
+      "title": "War Preparations (disambiguation)",
+      "url": "https://wiki.guildwars.com/wiki/War_Preparations_(disambiguation)",
+      "pageId": 99289,
+      "revisionId": 1312330,
+      "revisionTimestamp": "2009-01-20T22:05:04Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-35",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 35",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_35",
+      "pageId": 23371,
+      "revisionId": 2651051,
+      "revisionTimestamp": "2020-04-22T13:40:58Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article War Preparations."
+    },
+    {
+      "id": "gww-game-link-quest-220",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 220",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_220",
+      "pageId": 23559,
+      "revisionId": 2650908,
+      "revisionTimestamp": "2020-04-22T13:38:34Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article War Preparations."
+    },
+    {
+      "id": "gww-warrior-test",
+      "kind": "wiki_article",
+      "title": "Warrior Test",
+      "url": "https://wiki.guildwars.com/wiki/Warrior_Test",
+      "pageId": 11772,
+      "revisionId": 2741097,
+      "revisionTimestamp": "2026-09-18T13:09:07Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-85",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 85",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_85",
+      "pageId": 23421,
+      "revisionId": 2651605,
+      "revisionTimestamp": "2020-04-22T13:50:17Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Warrior Test."
+    },
+    {
+      "id": "gww-ranger-test",
+      "kind": "wiki_article",
+      "title": "Ranger Test",
+      "url": "https://wiki.guildwars.com/wiki/Ranger_Test",
+      "pageId": 11029,
+      "revisionId": 2741098,
+      "revisionTimestamp": "2026-09-18T13:29:54Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-86",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 86",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_86",
+      "pageId": 23422,
+      "revisionId": 2651616,
+      "revisionTimestamp": "2020-04-22T13:50:29Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Ranger Test."
+    },
+    {
+      "id": "gww-monk-test",
+      "kind": "wiki_article",
+      "title": "Monk Test",
+      "url": "https://wiki.guildwars.com/wiki/Monk_Test",
+      "pageId": 25506,
+      "revisionId": 2741099,
+      "revisionTimestamp": "2026-09-18T13:40:51Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-84",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 84",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_84",
+      "pageId": 23420,
+      "revisionId": 2651594,
+      "revisionTimestamp": "2020-04-22T13:50:06Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Monk Test."
+    },
+    {
+      "id": "gww-necromancer-test",
+      "kind": "wiki_article",
+      "title": "Necromancer Test",
+      "url": "https://wiki.guildwars.com/wiki/Necromancer_Test",
+      "pageId": 11068,
+      "revisionId": 2741055,
+      "revisionTimestamp": "2026-09-17T20:37:25Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-82",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 82",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_82",
+      "pageId": 23418,
+      "revisionId": 2651572,
+      "revisionTimestamp": "2020-04-22T13:49:44Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Necromancer Test."
+    },
+    {
+      "id": "gww-mesmer-test",
+      "kind": "wiki_article",
+      "title": "Mesmer Test",
+      "url": "https://wiki.guildwars.com/wiki/Mesmer_Test",
+      "pageId": 25505,
+      "revisionId": 2741244,
+      "revisionTimestamp": "2026-09-20T17:46:58Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-81",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 81",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_81",
+      "pageId": 23415,
+      "revisionId": 2651561,
+      "revisionTimestamp": "2020-04-22T13:49:33Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Mesmer Test."
+    },
+    {
+      "id": "gww-elementalist-test",
+      "kind": "wiki_article",
+      "title": "Elementalist Test",
+      "url": "https://wiki.guildwars.com/wiki/Elementalist_Test",
+      "pageId": 11765,
+      "revisionId": 2741105,
+      "revisionTimestamp": "2026-09-18T14:09:08Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-83",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 83",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_83",
+      "pageId": 23419,
+      "revisionId": 2651583,
+      "revisionTimestamp": "2020-04-22T13:49:55Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Elementalist Test."
+    },
+    {
+      "id": "gww-further-adventures",
+      "kind": "wiki_article",
+      "title": "Further Adventures",
+      "url": "https://wiki.guildwars.com/wiki/Further_Adventures",
+      "pageId": 14282,
+      "revisionId": 2741376,
+      "revisionTimestamp": "2026-09-21T23:05:55Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-54",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 54",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_54",
+      "pageId": 23390,
+      "revisionId": 2651262,
+      "revisionTimestamp": "2020-04-22T13:44:34Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Further Adventures."
+    },
+    {
+      "id": "gww-adventure-with-an-ally",
+      "kind": "wiki_article",
+      "title": "Adventure with an Ally",
+      "url": "https://wiki.guildwars.com/wiki/Adventure_with_an_Ally",
+      "pageId": 14784,
+      "revisionId": 2727895,
+      "revisionTimestamp": "2026-05-11T15:58:07Z",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "gww-game-link-quest-56",
+      "kind": "wiki_game_link",
+      "title": "Game link:Quest 56",
+      "url": "https://wiki.guildwars.com/wiki/Game_link:Quest_56",
+      "pageId": 23392,
+      "revisionId": 2651284,
+      "revisionTimestamp": "2020-04-22T13:44:56Z",
+      "retrievedAt": "2026-11-26",
+      "note": "Redirects to the ingame-help article Adventure with an Ally."
+    },
+    {
+      "id": "gww-template-standard-prerequisites",
+      "kind": "wiki_template",
+      "title": "Template:Standard prerequisites",
+      "url": "https://wiki.guildwars.com/wiki/Template:Standard_prerequisites",
+      "pageId": 220943,
+      "revisionId": 2723807,
+      "revisionTimestamp": "2026-04-01T22:17:06Z",
+      "retrievedAt": "2026-11-26",
+      "note": "The template, set for the Pre-Searing campaign with its default test flag, lists a completed primary profession test and Pre-Searing status as requirements."
+    },
+    {
+      "id": "repo-hintsmodule-quest-56",
+      "kind": "repo_code",
+      "title": "HintsModule OnQuestAdded_UIMessage: case 56 // Adventure with an ally",
+      "repoPath": "GWToolboxdll/Modules/HintsModule.cpp",
+      "repoRevision": "bbe0576c0",
+      "retrievedAt": "2026-11-26",
+      "note": "Upstream code switching on the kQuestAdded quest id; line introduced by 39a5a55692 (2023-07-12)."
+    },
+    {
+      "id": "repo-gwca-questids",
+      "kind": "repo_code",
+      "title": "GWCA Constants QuestID enum",
+      "repoPath": "Dependencies/GWCA/include/GWCA/Constants/QuestIDs.h",
+      "repoRevision": "blob 348074fcb3942e44311249bcd0dd0dbfd8719269",
+      "retrievedAt": "2026-11-26",
+      "note": "Contains no Pre-Searing quest; used only for the numbering cross-check."
+    },
+    {
+      "id": "toolbox-live-exports-2026-11",
+      "kind": "toolbox_live_export",
+      "title": "Local Quest Progress Contract v1 exports of this fork (SZABOBE16IRX9 profile, 2026-10-17..2026-11-25)",
+      "retrievedAt": "2026-11-26",
+      "note": "Read-only, not copied into the repo. gameQuestId + state + objective count only; questName and objective text are empty in these files. Character profession taken from primaryProfession (3 = monk, 5 = mesmer)."
+    },
+    {
+      "id": "in-game-f10-help-quest-1462-2026-11-27",
+      "kind": "wiki_game_link",
+      "title": "F10 Help panel Game link capture for Quest 1462 (Bence, 2026-11-27)",
+      "url": "https://wiki.guildwars.com/wiki/Getting_Started_in_Guild_Wars?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_1462%26redirect%3Dno",
+      "retrievedAt": "2026-11-27",
+      "note": "Opened from the vanilla Guild Wars Help panel (F10) with Toolbox not loaded, on a Pre-Searing primary Monk, with the quest in the log. The browser landed on this URL and the page returned HTTP 403. The pre-redirect title Game_link:Quest_1462 is taken from the rdfrom query parameter. Captured by Bence as URL text; no screenshot. Time: about 02:55 Europe/Budapest."
+    },
+    {
+      "id": "in-game-f10-help-quest-84-2026-11-27",
+      "kind": "wiki_game_link",
+      "title": "F10 Help panel Game link capture for Quest 84 (Bence, 2026-11-27)",
+      "url": "https://wiki.guildwars.com/wiki/Monk_Test?rdfrom=https%3A%2F%2Fwiki.guildwars.com%2Findex.php%3Ftitle%3DGame_link%3AQuest_84%26redirect%3Dno",
+      "retrievedAt": "2026-11-27",
+      "note": "Opened from the vanilla Guild Wars Help panel (F10) with Toolbox not loaded, on a Pre-Searing primary Monk, with the quest in the log. The pre-redirect title Game_link:Quest_84 is taken from the rdfrom query parameter of the captured URL. Captured by Bence as URL text; no screenshot. Date: 2026-11-27, Europe/Budapest."
+    }
+  ],
+  "quests": [
+    {
+      "key": "presearing.getting_started_in_guild_wars",
+      "name": "Getting Started in Guild Wars",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "any",
+      "reforgedModeOnly": "yes",
+      "gameQuestId": 1462,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "verified_in_game",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-getting-started-in-guild-wars",
+            "value": 1462
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-1462",
+            "value": 1462
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-1000-1499",
+            "value": 1462
+          },
+          {
+            "kind": "toolbox_live_observation",
+            "sourceId": "toolbox-live-exports-2026-11",
+            "value": 1462,
+            "note": "Present on 5 of 5 isPreSearing=true characters, absent on the post-Searing one; one monk character shows objectives 1 -> 2 with objective 0 completed under the same id after Monk Test reward evidence."
+          },
+          {
+            "kind": "in_game_game_link",
+            "sourceId": "in-game-f10-help-quest-1462-2026-11-27",
+            "value": 1462,
+            "observedName": "Getting Started in Guild Wars",
+            "campaignContext": "prophecies",
+            "professionContext": "monk",
+            "preRedirect": true,
+            "note": "Quest log name observed as Getting Started in Guild Wars. Region context: Pre-Searing (ascalon_pre_searing); campaignContext is prophecies because that is the catalog campaign field. Primary profession Monk. Method: F10 Help panel, Toolbox not loaded. The opened page returned HTTP 403. The pre-redirect title Game_link:Quest_1462 was taken from the rdfrom parameter of the captured URL, not from a Redirected from page header (that header is suppressed by the wiki ingame-help prefix, and the rdfrom landing page is 403). Captured by Bence on 2026-11-27 at about 02:55 Europe/Budapest, as URL text, no screenshot."
+          }
+        ],
+        "note": "In-game F10 Help panel capture on 2026-11-27 binds the quest-log name to Game_link:Quest_1462 (rdfrom parameter of a 403 URL). Auto-linkable."
+      },
+      "sourceIds": [
+        "gww-getting-started-in-guild-wars",
+        "gww-game-link-quest-1462",
+        "gww-game-integration-quests-1000-1499",
+        "toolbox-live-exports-2026-11",
+        "in-game-f10-help-quest-1462-2026-11-27"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "gww-getting-started-in-guild-wars",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Profession test; giver: the trainer posted immediately beyond the city gate."
+          },
+          {
+            "index": 1,
+            "summary": "Task from Devona."
+          },
+          {
+            "index": 2,
+            "summary": "Secondary profession: try trainers, then report the choice to Armin Saberlin."
+          },
+          {
+            "index": 3,
+            "summary": "Sir Tydus, before leaving Pre-Searing."
+          },
+          {
+            "index": 4,
+            "summary": "Turn-in NPC: any Town Crier."
+          }
+        ],
+        "note": "Stage switching is sourced from the article's 'Intermediate dialogue' (after completing the profession test / Unsettling Rumors / A Second Profession). Whether completed stages stay listed in the log is not stated by the source."
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Town Crier",
+        "sourceId": "gww-getting-started-in-guild-wars",
+        "note": "Turn-in is at a Town Crier."
+      },
+      "branching": {
+        "kind": "profession_variant",
+        "sourceId": "gww-getting-started-in-guild-wars",
+        "note": "Sub-quest varies with primary profession; the source does not say the quest id itself changes."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [],
+      "notes": [
+        {
+          "sourceId": "gww-getting-started-in-guild-wars",
+          "note": "Known defect recorded in the source: taking this quest once A Second Profession is already finished omits the Town Crier step and blocks the reward. Relevant to closure."
+        }
+      ]
+    },
+    {
+      "key": "presearing.war_preparations",
+      "name": "War Preparations",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "unknown",
+      "reforgedModeOnly": "no",
+      "gameQuestId": null,
+      "candidateGameQuestIds": [
+        35,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222
+      ],
+      "idVerification": {
+        "status": "ambiguous",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-war-preparations",
+            "value": 219,
+            "note": "One infobox for several same-named quests."
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-35",
+            "value": 35
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-220",
+            "value": 220
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 35,
+            "note": "Also 217, 218, 219, 221, 222 -> War Preparations."
+          },
+          {
+            "kind": "toolbox_live_observation",
+            "sourceId": "toolbox-live-exports-2026-11",
+            "value": 220,
+            "note": "Seen only on monk-primary characters (2); a profession-to-id binding is not established by any source."
+          }
+        ],
+        "note": "Name match cannot select an id: seven ids redirect to the same article and the disambiguation page describes six Pre-Searing variants. Never auto-linked."
+      },
+      "sourceIds": [
+        "gww-war-preparations",
+        "gww-war-preparations-disambiguation",
+        "gww-game-link-quest-35",
+        "gww-game-link-quest-220",
+        "gww-game-integration-quests-0-499",
+        "toolbox-live-exports-2026-11"
+      ],
+      "objectives": {
+        "model": "single",
+        "sourceId": "gww-war-preparations",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Area: Lakeside County. Talk to the primary profession trainer."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "<primary profession trainer>",
+        "sourceId": "gww-war-preparations",
+        "note": "Completion: talking to the trainer outside the gate."
+      },
+      "branching": {
+        "kind": "profession_variant",
+        "sourceId": "gww-war-preparations-disambiguation",
+        "note": "The disambiguation page describes six Pre-Searing variants for starting primary profession training."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "presearing.warrior_test",
+          "sourceId": "gww-warrior-test",
+          "note": "Test article lists War Preparations under 'preceded by'; War Preparations is skippable, so this is not a requirement."
+        },
+        {
+          "target": "presearing.ranger_test",
+          "sourceId": "gww-ranger-test",
+          "note": "Test article lists War Preparations under 'preceded by'; War Preparations is skippable, so this is not a requirement."
+        },
+        {
+          "target": "presearing.monk_test",
+          "sourceId": "gww-monk-test",
+          "note": "Test article lists War Preparations under 'preceded by'; War Preparations is skippable, so this is not a requirement."
+        },
+        {
+          "target": "presearing.necromancer_test",
+          "sourceId": "gww-necromancer-test",
+          "note": "Test article lists War Preparations under 'preceded by'; War Preparations is skippable, so this is not a requirement."
+        },
+        {
+          "target": "presearing.elementalist_test",
+          "sourceId": "gww-elementalist-test",
+          "note": "Test article lists War Preparations under 'preceded by'; War Preparations is skippable, so this is not a requirement."
+        }
+      ],
+      "notes": [
+        {
+          "sourceId": "gww-war-preparations",
+          "note": "Optional: the source states this quest is skippable; the trainer can be approached without accepting it."
+        },
+        {
+          "sourceId": "gww-war-preparations",
+          "note": "Available only before the primary profession test is finished. Availability, not a required predecessor."
+        }
+      ]
+    },
+    {
+      "key": "presearing.warrior_test",
+      "name": "Warrior Test",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "warrior",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 85,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "source_claimed",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-warrior-test",
+            "value": 85
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-85",
+            "value": 85
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 85
+          }
+        ],
+        "note": "Wiki sources only; not observed in local exports."
+      },
+      "sourceIds": [
+        "gww-warrior-test",
+        "gww-game-link-quest-85",
+        "gww-game-integration-quests-0-499"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "gww-warrior-test",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Combat: river skale, southwest of the city."
+          },
+          {
+            "index": 1,
+            "summary": "Turn-in NPC: Van the Warrior."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Van the Warrior",
+        "sourceId": "gww-warrior-test",
+        "note": "Article 'Reward dialogue' section by Van the Warrior."
+      },
+      "branching": {
+        "kind": "unknown",
+        "note": "The article lists several follow-ups; whether they are exclusive or parallel is not stated."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "presearing.further_adventures",
+          "sourceId": "gww-warrior-test"
+        },
+        {
+          "target": "presearing.adventure_with_an_ally",
+          "sourceId": "gww-warrior-test"
+        }
+      ],
+      "outOfScopeFollowUps": [
+        {
+          "name": "Unsettling Rumors",
+          "sourceId": "gww-warrior-test"
+        },
+        {
+          "name": "A Second Profession",
+          "sourceId": "gww-warrior-test"
+        }
+      ]
+    },
+    {
+      "key": "presearing.ranger_test",
+      "name": "Ranger Test",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "ranger",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 86,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "source_claimed",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-ranger-test",
+            "value": 86
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-86",
+            "value": 86
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 86
+          }
+        ],
+        "note": "Wiki sources only; not observed in local exports."
+      },
+      "sourceIds": [
+        "gww-ranger-test",
+        "gww-game-link-quest-86",
+        "gww-game-integration-quests-0-499"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "gww-ranger-test",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Combat: the river skale queen."
+          },
+          {
+            "index": 1,
+            "summary": "Turn-in NPC: Artemis the Ranger."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Artemis the Ranger",
+        "sourceId": "gww-ranger-test",
+        "note": "Article 'Reward dialogue' section by Artemis the Ranger."
+      },
+      "branching": {
+        "kind": "unknown",
+        "note": "The article lists several follow-ups; whether they are exclusive or parallel is not stated."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "presearing.further_adventures",
+          "sourceId": "gww-ranger-test"
+        },
+        {
+          "target": "presearing.adventure_with_an_ally",
+          "sourceId": "gww-ranger-test"
+        }
+      ],
+      "outOfScopeFollowUps": [
+        {
+          "name": "Unsettling Rumors",
+          "sourceId": "gww-ranger-test"
+        },
+        {
+          "name": "A Second Profession",
+          "sourceId": "gww-ranger-test"
+        }
+      ]
+    },
+    {
+      "key": "presearing.monk_test",
+      "name": "Monk Test",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "monk",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 84,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "verified_in_game",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-monk-test",
+            "value": 84
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-84",
+            "value": 84
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 84
+          },
+          {
+            "kind": "toolbox_live_observation",
+            "sourceId": "toolbox-live-exports-2026-11",
+            "value": 84,
+            "note": "Seen only on monk-primary characters (2): one at 1 objective, one at 2 objectives with objective 0 completed plus reward evidence (completed_observed/probable)."
+          },
+          {
+            "kind": "in_game_game_link",
+            "sourceId": "in-game-f10-help-quest-84-2026-11-27",
+            "value": 84,
+            "observedName": "Monk Test",
+            "campaignContext": "prophecies",
+            "professionContext": "monk",
+            "preRedirect": true,
+            "note": "Quest log name observed as Monk Test. Region context: Pre-Searing (ascalon_pre_searing); campaignContext is prophecies because that is the catalog campaign field. Primary profession Monk. Method: F10 Help panel, Toolbox not loaded. The pre-redirect title Game_link:Quest_84 was taken from the rdfrom parameter of the captured URL, not from a Redirected from page header. Captured by Bence on 2026-11-27, as URL text, no screenshot."
+          }
+        ],
+        "note": "In-game F10 Help panel capture on 2026-11-27 binds the quest-log name to Game_link:Quest_84 (rdfrom parameter of the captured URL). Auto-linkable."
+      },
+      "sourceIds": [
+        "gww-monk-test",
+        "gww-game-link-quest-84",
+        "gww-game-integration-quests-0-499",
+        "toolbox-live-exports-2026-11",
+        "in-game-f10-help-quest-84-2026-11-27"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "gww-monk-test",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Find NPC: Gwen. Area: river southwest of the city."
+          },
+          {
+            "index": 1,
+            "summary": "Type: escort. Escorted NPC: Gwen. Destination: Ciglo the Monk."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Ciglo the Monk",
+        "sourceId": "gww-monk-test",
+        "note": "Article 'Reward dialogue' section by Ciglo the Monk."
+      },
+      "branching": {
+        "kind": "unknown",
+        "note": "The article lists several follow-ups; whether they are exclusive or parallel is not stated."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "presearing.further_adventures",
+          "sourceId": "gww-monk-test"
+        },
+        {
+          "target": "presearing.adventure_with_an_ally",
+          "sourceId": "gww-monk-test"
+        }
+      ],
+      "outOfScopeFollowUps": [
+        {
+          "name": "Unsettling Rumors",
+          "sourceId": "gww-monk-test"
+        },
+        {
+          "name": "A Second Profession",
+          "sourceId": "gww-monk-test"
+        }
+      ]
+    },
+    {
+      "key": "presearing.necromancer_test",
+      "name": "Necromancer Test",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "necromancer",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 82,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "source_claimed",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-necromancer-test",
+            "value": 82
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-82",
+            "value": 82
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 82
+          }
+        ],
+        "note": "Wiki sources only; not observed in local exports."
+      },
+      "sourceIds": [
+        "gww-necromancer-test",
+        "gww-game-link-quest-82",
+        "gww-game-integration-quests-0-499"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "gww-necromancer-test",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Verata needs a skale corpse from the river."
+          },
+          {
+            "index": 1,
+            "summary": "Turn-in NPC: Verata the Necromancer."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Verata the Necromancer",
+        "sourceId": "gww-necromancer-test",
+        "note": "Article 'Reward dialogue' section by Verata the Necromancer."
+      },
+      "branching": {
+        "kind": "unknown",
+        "note": "The article lists several follow-ups; whether they are exclusive or parallel is not stated."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "presearing.further_adventures",
+          "sourceId": "gww-necromancer-test"
+        },
+        {
+          "target": "presearing.adventure_with_an_ally",
+          "sourceId": "gww-necromancer-test"
+        }
+      ],
+      "outOfScopeFollowUps": [
+        {
+          "name": "Unsettling Rumors",
+          "sourceId": "gww-necromancer-test"
+        },
+        {
+          "name": "A Second Profession",
+          "sourceId": "gww-necromancer-test"
+        }
+      ]
+    },
+    {
+      "key": "presearing.mesmer_test",
+      "name": "Mesmer Test",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "mesmer",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 81,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "corroborated",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-mesmer-test",
+            "value": 81
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-81",
+            "value": 81
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 81
+          },
+          {
+            "kind": "toolbox_live_observation",
+            "sourceId": "toolbox-live-exports-2026-11",
+            "value": 81,
+            "note": "Seen on a mesmer-primary character (1 -> 2 objectives, objective 0 completed, ready_for_reward) and on one character with unknown profession; never on monk-primary characters."
+          }
+        ],
+        "note": "Wiki id sources plus profession-consistent live observation; no in-game name/text capture yet."
+      },
+      "sourceIds": [
+        "gww-mesmer-test",
+        "gww-game-link-quest-81",
+        "gww-game-integration-quests-0-499",
+        "toolbox-live-exports-2026-11"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "gww-mesmer-test",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Combat: skale on the road southwest of the city."
+          },
+          {
+            "index": 1,
+            "summary": "Turn-in NPC: Sebedoh the Mesmer."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Sebedoh the Mesmer",
+        "sourceId": "gww-mesmer-test",
+        "note": "Article 'Reward dialogue' section by Sebedoh the Mesmer."
+      },
+      "branching": {
+        "kind": "unknown",
+        "note": "The article lists several follow-ups; whether they are exclusive or parallel is not stated."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "presearing.further_adventures",
+          "sourceId": "gww-mesmer-test"
+        },
+        {
+          "target": "presearing.adventure_with_an_ally",
+          "sourceId": "gww-mesmer-test"
+        }
+      ],
+      "outOfScopeFollowUps": [
+        {
+          "name": "A Mesmer's Burden",
+          "sourceId": "gww-mesmer-test"
+        },
+        {
+          "name": "A Monk's Mission",
+          "sourceId": "gww-mesmer-test"
+        },
+        {
+          "name": "A Second Profession",
+          "sourceId": "gww-mesmer-test"
+        },
+        {
+          "name": "Grawl Invasion",
+          "sourceId": "gww-mesmer-test"
+        },
+        {
+          "name": "The Elementalist Experiment",
+          "sourceId": "gww-mesmer-test"
+        },
+        {
+          "name": "The Necromancer's Novice",
+          "sourceId": "gww-mesmer-test"
+        },
+        {
+          "name": "The Ranger's Companion",
+          "sourceId": "gww-mesmer-test"
+        }
+      ]
+    },
+    {
+      "key": "presearing.elementalist_test",
+      "name": "Elementalist Test",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "elementalist",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 83,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "source_claimed",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-elementalist-test",
+            "value": 83
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-83",
+            "value": 83
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 83
+          }
+        ],
+        "note": "Wiki sources only; not observed in local exports."
+      },
+      "sourceIds": [
+        "gww-elementalist-test",
+        "gww-game-link-quest-83",
+        "gww-game-integration-quests-0-499"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "gww-elementalist-test",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Collect: one shimmering scale from skale southwest of the city."
+          },
+          {
+            "index": 1,
+            "summary": "Progress marker for the shimmering-scale collection (starts at 0 of 1)."
+          },
+          {
+            "index": 2,
+            "summary": "Turn-in NPC: Howland the Elementalist."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Howland the Elementalist",
+        "sourceId": "gww-elementalist-test",
+        "note": "Article 'Reward dialogue' section by Howland the Elementalist."
+      },
+      "branching": {
+        "kind": "unknown",
+        "note": "The article lists several follow-ups; whether they are exclusive or parallel is not stated."
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "presearing.further_adventures",
+          "sourceId": "gww-elementalist-test"
+        },
+        {
+          "target": "presearing.adventure_with_an_ally",
+          "sourceId": "gww-elementalist-test"
+        }
+      ],
+      "outOfScopeFollowUps": [
+        {
+          "name": "Unsettling Rumors",
+          "sourceId": "gww-elementalist-test"
+        },
+        {
+          "name": "A Second Profession",
+          "sourceId": "gww-elementalist-test"
+        },
+        {
+          "name": "The Elementalist Experiment",
+          "sourceId": "gww-elementalist-test"
+        }
+      ]
+    },
+    {
+      "key": "presearing.further_adventures",
+      "name": "Further Adventures",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "primary",
+      "profession": "any",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 54,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "corroborated",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-further-adventures",
+            "value": 54
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-54",
+            "value": 54
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 54
+          },
+          {
+            "kind": "toolbox_live_observation",
+            "sourceId": "toolbox-live-exports-2026-11",
+            "value": 54,
+            "note": "Seen on one monk-primary character, which also carries Monk Test (84) reward evidence."
+          }
+        ],
+        "note": "No in-game name/text capture yet."
+      },
+      "sourceIds": [
+        "gww-further-adventures",
+        "gww-game-link-quest-54",
+        "gww-game-integration-quests-0-499",
+        "gww-template-standard-prerequisites",
+        "toolbox-live-exports-2026-11"
+      ],
+      "objectives": {
+        "model": "single",
+        "sourceId": "gww-further-adventures",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Destination: Devona in Ashford, via the southwest road."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Devona",
+        "sourceId": "gww-further-adventures"
+      },
+      "branching": {
+        "kind": "unknown",
+        "note": "Followed by six 'A New <Profession> Trainer' quests; exclusivity not stated."
+      },
+      "requires_completion_of": [
+        {
+          "anyOf": [
+            "presearing.warrior_test",
+            "presearing.ranger_test",
+            "presearing.monk_test",
+            "presearing.necromancer_test",
+            "presearing.mesmer_test",
+            "presearing.elementalist_test"
+          ],
+          "sourceId": "gww-template-standard-prerequisites",
+          "basis": "Article requirements list a completed primary profession test (any of the six) for a Pre-Searing character.",
+          "note": "The article relies on the shared prerequisites template (Pre-Searing, test required). Only the character's own primary profession test applies; the source does not bind profession to id."
+        }
+      ],
+      "related_follow_up": [],
+      "outOfScopeFollowUps": [
+        {
+          "name": "A New Warrior Trainer",
+          "sourceId": "gww-further-adventures"
+        },
+        {
+          "name": "A New Ranger Trainer",
+          "sourceId": "gww-further-adventures"
+        },
+        {
+          "name": "A New Monk Trainer",
+          "sourceId": "gww-further-adventures"
+        },
+        {
+          "name": "A New Necromancer Trainer",
+          "sourceId": "gww-further-adventures"
+        },
+        {
+          "name": "A New Mesmer Trainer",
+          "sourceId": "gww-further-adventures"
+        },
+        {
+          "name": "A New Elementalist Trainer",
+          "sourceId": "gww-further-adventures"
+        }
+      ],
+      "notes": [
+        {
+          "sourceId": "gww-further-adventures",
+          "note": "Unsettling Rumors and A Second Profession remain available after the profession test, whether or not this quest is finished."
+        }
+      ]
+    },
+    {
+      "key": "presearing.adventure_with_an_ally",
+      "name": "Adventure with an Ally",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "skill",
+      "profession": "any",
+      "reforgedModeOnly": "no",
+      "gameQuestId": 56,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "corroborated",
+        "evidence": [
+          {
+            "kind": "wiki_infobox_id",
+            "sourceId": "gww-adventure-with-an-ally",
+            "value": 56
+          },
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "gww-game-link-quest-56",
+            "value": 56
+          },
+          {
+            "kind": "wiki_game_integration_table",
+            "sourceId": "gww-game-integration-quests-0-499",
+            "value": 56
+          },
+          {
+            "kind": "repo_code_reference",
+            "sourceId": "repo-hintsmodule-quest-56",
+            "value": 56
+          },
+          {
+            "kind": "toolbox_live_observation",
+            "sourceId": "toolbox-live-exports-2026-11",
+            "value": 56,
+            "note": "Seen on one monk-primary Pre-Searing character."
+          }
+        ],
+        "note": "Upstream code annotation is a developer claim, not a capture; no in-game name/text capture yet."
+      },
+      "sourceIds": [
+        "gww-adventure-with-an-ally",
+        "gww-game-link-quest-56",
+        "gww-game-integration-quests-0-499",
+        "repo-hintsmodule-quest-56",
+        "toolbox-live-exports-2026-11"
+      ],
+      "objectives": {
+        "model": "single",
+        "sourceId": "gww-adventure-with-an-ally",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Area: Ascalon City. Objective: add another player to the party."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Lina the Healer",
+        "sourceId": "gww-adventure-with-an-ally",
+        "note": "Turn-in NPC: Lina the Healer."
+      },
+      "branching": {
+        "kind": "none_stated"
+      },
+      "requires_completion_of": [
+        {
+          "anyOf": [
+            "presearing.warrior_test",
+            "presearing.ranger_test",
+            "presearing.monk_test",
+            "presearing.necromancer_test",
+            "presearing.mesmer_test",
+            "presearing.elementalist_test"
+          ],
+          "sourceId": "gww-adventure-with-an-ally",
+          "basis": "Article requirements list a completed primary profession test (any of the six) for a Pre-Searing character."
+        }
+      ],
+      "related_follow_up": []
+    }
+  ]
+}

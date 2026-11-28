@@ -1,0 +1,284 @@
+{
+  "catalog": "gwtoolbox-quest-catalog",
+  "schemaVersion": 1,
+  "catalogVersion": "0.1.0-fixture",
+  "scope": {
+    "campaign": "prophecies",
+    "region": "ascalon_pre_searing",
+    "synthetic": true,
+    "taskSpec": "TOOLBOX-QUEST-CATALOG-CHAINS-01",
+    "note": "Synthetic ids only; does not claim real Guild Wars quest data."
+  },
+  "dataCaptureReady": "NOT_READY",
+  "linkPolicy": {
+    "autoLinkStatuses": [
+      "verified_in_game"
+    ],
+    "candidateStatuses": [
+      "corroborated",
+      "source_claimed"
+    ],
+    "neverLinkStatuses": [
+      "ambiguous",
+      "unknown"
+    ]
+  },
+  "sources": [
+    {
+      "id": "synthetic-fixture",
+      "kind": "synthetic_fixture",
+      "title": "Synthetic fixture source",
+      "retrievedAt": "2026-11-26"
+    },
+    {
+      "id": "synthetic-wiki",
+      "kind": "wiki_article",
+      "title": "Synthetic wiki article",
+      "retrievedAt": "2026-11-26"
+    }
+  ],
+  "quests": [
+    {
+      "key": "synthetic.quest_a",
+      "name": "Synthetic Quest A",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "secondary",
+      "profession": "any",
+      "gameQuestId": 900101,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "verified_in_game",
+        "evidence": [
+          {
+            "kind": "in_game_game_link",
+            "sourceId": "synthetic-fixture",
+            "value": 900101,
+            "observedName": "Synthetic Quest A",
+            "campaignContext": "prophecies",
+            "professionContext": "any",
+            "preRedirect": true
+          }
+        ]
+      },
+      "sourceIds": [
+        "synthetic-fixture"
+      ],
+      "objectives": {
+        "model": "sequential_same_id",
+        "sourceId": "synthetic-fixture",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Synthetic stage one."
+          },
+          {
+            "index": 1,
+            "summary": "Synthetic stage two."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Synthetic NPC",
+        "sourceId": "synthetic-fixture"
+      },
+      "branching": {
+        "kind": "unknown"
+      },
+      "requires_completion_of": [],
+      "related_follow_up": [
+        {
+          "target": "synthetic.quest_b",
+          "sourceId": "synthetic-fixture"
+        }
+      ]
+    },
+    {
+      "key": "synthetic.quest_b",
+      "name": "Synthetic Quest B",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "secondary",
+      "profession": "any",
+      "gameQuestId": 900102,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "verified_in_game",
+        "evidence": [
+          {
+            "kind": "producer_name_id_pair",
+            "sourceId": "synthetic-fixture",
+            "value": 900102,
+            "observedName": "Synthetic Quest B",
+            "campaignContext": "prophecies",
+            "professionContext": "any"
+          }
+        ]
+      },
+      "sourceIds": [
+        "synthetic-fixture"
+      ],
+      "objectives": {
+        "model": "single",
+        "sourceId": "synthetic-fixture",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Synthetic objective summary."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Synthetic NPC",
+        "sourceId": "synthetic-fixture"
+      },
+      "branching": {
+        "kind": "unknown"
+      },
+      "requires_completion_of": [
+        {
+          "anyOf": [
+            "synthetic.quest_a"
+          ],
+          "sourceId": "synthetic-fixture",
+          "basis": "Synthetic prerequisite."
+        }
+      ],
+      "related_follow_up": []
+    },
+    {
+      "key": "synthetic.quest_c",
+      "name": "Synthetic Quest C",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "secondary",
+      "profession": "any",
+      "gameQuestId": 900103,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "corroborated",
+        "evidence": [
+          {
+            "kind": "wiki_game_link",
+            "sourceId": "synthetic-wiki",
+            "value": 900103
+          },
+          {
+            "kind": "toolbox_live_observation",
+            "sourceId": "synthetic-fixture",
+            "value": 900103
+          }
+        ]
+      },
+      "sourceIds": [
+        "synthetic-fixture"
+      ],
+      "objectives": {
+        "model": "single",
+        "sourceId": "synthetic-fixture",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Synthetic objective summary."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Synthetic NPC",
+        "sourceId": "synthetic-fixture"
+      },
+      "branching": {
+        "kind": "unknown"
+      },
+      "requires_completion_of": [],
+      "related_follow_up": []
+    },
+    {
+      "key": "synthetic.quest_d",
+      "name": "Synthetic Quest D",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "secondary",
+      "profession": "any",
+      "gameQuestId": null,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "unknown",
+        "evidence": []
+      },
+      "sourceIds": [
+        "synthetic-fixture"
+      ],
+      "objectives": {
+        "model": "unknown",
+        "stages": []
+      },
+      "completion": {
+        "mode": "unknown"
+      },
+      "branching": {
+        "kind": "unknown"
+      },
+      "requires_completion_of": [],
+      "related_follow_up": []
+    },
+    {
+      "key": "synthetic.quest_e",
+      "name": "Synthetic Quest E",
+      "campaign": "prophecies",
+      "region": "ascalon_pre_searing",
+      "questType": "secondary",
+      "profession": "any",
+      "gameQuestId": 900104,
+      "candidateGameQuestIds": [],
+      "idVerification": {
+        "status": "verified_in_game",
+        "evidence": [
+          {
+            "kind": "in_game_game_link",
+            "sourceId": "synthetic-fixture",
+            "value": 900104,
+            "observedName": "Synthetic Quest E",
+            "campaignContext": "prophecies",
+            "professionContext": "any",
+            "preRedirect": true
+          }
+        ]
+      },
+      "sourceIds": [
+        "synthetic-fixture"
+      ],
+      "objectives": {
+        "model": "single",
+        "sourceId": "synthetic-fixture",
+        "stages": [
+          {
+            "index": 0,
+            "summary": "Synthetic objective summary."
+          }
+        ]
+      },
+      "completion": {
+        "mode": "reward_dialogue",
+        "npc": "Synthetic NPC",
+        "sourceId": "synthetic-fixture"
+      },
+      "branching": {
+        "kind": "unknown"
+      },
+      "requires_completion_of": [
+        {
+          "anyOf": [
+            "synthetic.quest_c"
+          ],
+          "sourceId": "synthetic-fixture",
+          "basis": "Synthetic prerequisite on an unverified entry."
+        }
+      ],
+      "related_follow_up": []
+    }
+  ]
+}

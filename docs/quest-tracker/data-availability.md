@@ -117,6 +117,10 @@ Do not feed `kObjective*` into quest-log objective reducers.
 7. Mission objectives clearing on map leave is expected and unrelated to quest-log completion.
 8. Synthetic custom marker quest `0xfdd` is not real progress.
 
+## Offline Pre-Searing catalog (pilot)
+
+Egy offline Pre-Searing küldetéskatalógus-pilot, nem runtime adat: [catalog/README.md](catalog/README.md). Egy későbbi küldetés megjelenése önmagában nem igazolja az előző lezárását; lezárásnak csak a fenti bizonyíték számít.
+
 ## Character / account identity
 
 Preferred persistence identity:
